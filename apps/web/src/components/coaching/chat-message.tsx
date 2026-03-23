@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ThumbsUp, ThumbsDown, Crown, Copy, Check } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -36,8 +37,14 @@ export function ChatMessage({ message, onFeedback, isStreaming }: ChatMessagePro
       {/* Avatar */}
       <div className="shrink-0 mt-1">
         {isKeith ? (
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center ring-2 ring-amber-500/20">
-            <Crown className="w-4 h-4 text-slate-900" />
+          <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-amber-500/30">
+            <Image
+              src="/images/keith/keith-orderofman.png"
+              alt="Coach Keith"
+              width={36}
+              height={36}
+              className="object-cover w-full h-full"
+            />
           </div>
         ) : (
           <Avatar className="w-9 h-9">

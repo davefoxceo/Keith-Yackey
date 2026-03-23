@@ -8,7 +8,9 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -64,6 +66,22 @@ class SwitchModeDto {
   mode: CoachingMode;
 }
 
+class StreamChatDto {
+  @ApiProperty({ example: "I've been struggling with communication in my marriage" })
+  @IsString()
+  message: string;
+
+  @ApiProperty({ required: false, description: 'Existing conversation ID to continue' })
+  @IsString()
+  @IsOptional()
+  conversationId?: string;
+
+  @ApiProperty({ required: false, description: 'Coaching mode', example: 'coach' })
+  @IsString()
+  @IsOptional()
+  mode?: string;
+}
+
 class SubmitFeedbackDto {
   @ApiProperty({ description: 'The AI message ID to provide feedback on' })
   @IsString()
@@ -87,6 +105,38 @@ class SubmitFeedbackDto {
 @Controller('coaching')
 export class CoachingController {
   constructor(private readonly coachingService: CoachingService) {}
+
+  @Post('chat')
+  @ApiOperation({
+    summary: 'Stream a chat message with Coach Keith',
+    description:
+      'Sends a message and streams the AI response via Server-Sent Events. Creates a new conversation if no conversationId is provided.',
+  })
+  @ApiResponse({ status: 200, description: 'SSE stream of AI response chunks' })
+  async streamChat(
+    @CurrentUser('id') userId: string,
+    @Body() dto: StreamChatDto,
+    @Res() res: Response,
+  ) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    try {
+      for await (const chunk of this.coachingService.streamChat(userId, dto)) {
+        res.write(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+      }
+      res.write('data: [DONE]\n\n');
+    } catch (error) {
+      res.write(
+        `data: ${JSON.stringify({ text: "I'm having a moment — let me try again. What were you saying?" })}\n\n`,
+      );
+      res.write('data: [DONE]\n\n');
+    }
+
+    res.end();
+  }
 
   @Post('conversations')
   @ApiOperation({

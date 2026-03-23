@@ -14,10 +14,12 @@ export class EnvironmentVariables {
   PORT: number = 3001;
 
   @IsString()
-  DATABASE_URL: string;
+  @IsOptional()
+  DATABASE_URL?: string;
 
   @IsString()
-  REDIS_URL: string;
+  @IsOptional()
+  REDIS_URL?: string;
 
   @IsString()
   ANTHROPIC_API_KEY: string;
@@ -34,10 +36,12 @@ export class EnvironmentVariables {
   JWT_REFRESH_EXPIRATION: string = '30d';
 
   @IsString()
-  RUVECTOR_PATH: string;
+  @IsOptional()
+  RUVECTOR_PATH?: string;
 
   @IsString()
-  ASSEMBLYAI_API_KEY: string;
+  @IsOptional()
+  ASSEMBLYAI_API_KEY?: string;
 
   @IsString()
   @IsOptional()

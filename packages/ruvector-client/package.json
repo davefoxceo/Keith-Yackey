@@ -9,11 +9,11 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "echo 'ruvector-client: consumed as source, skipping build'",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "ruvector": "^0.2.16",
     "@ruvector/core": "^0.1.25",
     "@ruvector/sona": "^0.1.4"

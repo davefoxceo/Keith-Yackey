@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
+import Anthropic from '@anthropic-ai/sdk';
 
 export enum CoachingMode {
   COACH = 'coach',
@@ -45,8 +46,13 @@ interface Conversation {
 export class CoachingService {
   private readonly logger = new Logger(CoachingService.name);
   private conversations: Map<string, Conversation> = new Map();
+  private anthropic: Anthropic;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {
+    this.anthropic = new Anthropic({
+      apiKey: this.configService.get<string>('ANTHROPIC_API_KEY'),
+    });
+  }
 
   async createConversation(
     userId: string,
@@ -314,51 +320,123 @@ export class CoachingService {
     mode: CoachingMode,
     fiveDialsContext?: Record<string, number>,
   ): Promise<string> {
-    // Build the prompt messages for the AI engine
-    // In production, this integrates with @coach-keith/ai-engine and Anthropic SDK
-    const anthropicApiKey = this.configService.get<string>('ANTHROPIC_API_KEY');
-
     try {
-      // TODO: Replace with actual CoachKeith AI engine integration
-      // const engine = new CoachKeithEngine({ apiKey: anthropicApiKey, ruvectorPath });
-      // return await engine.generateResponse({ messages, mode, fiveDialsContext });
+      const systemPrompt = this.buildSystemPrompt(mode, fiveDialsContext);
+      const apiMessages = messages
+        .filter((m) => m.role !== MessageRole.SYSTEM)
+        .map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }));
 
-      // Structured placeholder that demonstrates the response pattern
-      const contextNote = fiveDialsContext
-        ? ` Based on your Five Dials scores (${Object.entries(fiveDialsContext)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(', ')}), `
-        : ' ';
+      const response = await this.anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: apiMessages,
+      });
 
-      const lastUserMessage = [...messages]
-        .reverse()
-        .find((m) => m.role === MessageRole.USER);
-      const userContent = lastUserMessage?.content || '';
-
-      return this.buildModeResponse(mode, userContent, contextNote);
+      const textBlock = response.content.find((b) => b.type === 'text');
+      return textBlock?.text || "I'm here for you, brother. Tell me more about what's going on.";
     } catch (error) {
       this.logger.error(`AI response generation failed: ${error.message}`);
       return "I appreciate you sharing that. I'm experiencing a brief technical difficulty, but I'm here for you. Could you tell me a bit more about what's on your mind?";
     }
   }
 
-  private buildModeResponse(
-    mode: CoachingMode,
-    userMessage: string,
-    contextNote: string,
-  ): string {
-    switch (mode) {
-      case CoachingMode.COACH:
-        return `I hear you, brother.${contextNote}Let me ask you this — when you think about what you just shared, "${userMessage.substring(0, 60)}...", what's the deeper need underneath that? Often what we see on the surface is just the tip of the iceberg. Let's dig into the Five Dials together and find where the real growth opportunity is.`;
+  /**
+   * Stream a chat message via SSE. Creates or continues a conversation.
+   */
+  async *streamChat(
+    userId: string,
+    data: { conversationId?: string; message: string; mode?: string },
+  ): AsyncGenerator<string> {
+    const mode = (data.mode as CoachingMode) || CoachingMode.COACH;
 
-      case CoachingMode.MENTOR:
-        return `Great question, and I've seen this pattern many times.${contextNote}Here's what I've learned through years of coaching men just like you: the key is not to fix the symptom, but to understand the system. Let me share a framework that might help you see this differently.`;
+    // Get or create conversation
+    let conversation: Conversation;
+    if (data.conversationId && this.conversations.has(data.conversationId)) {
+      conversation = this.conversations.get(data.conversationId)!;
+      if (conversation.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    } else {
+      const conversationId = uuidv4();
+      conversation = {
+        id: conversationId,
+        userId,
+        title: this.generateTitle(data.message),
+        mode,
+        messages: [
+          {
+            id: uuidv4(),
+            role: MessageRole.SYSTEM,
+            content: this.buildSystemPrompt(mode),
+            mode,
+            timestamp: new Date(),
+          },
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.conversations.set(conversationId, conversation);
+    }
 
-      case CoachingMode.ACCOUNTABILITY:
-        return `Alright, let's get real for a second.${contextNote}You committed to making changes, and I'm here to hold you to that. What specific action did you take this week toward the goal we discussed? No sugarcoating — just the truth. That's how we grow.`;
+    // Add user message
+    conversation.messages.push({
+      id: uuidv4(),
+      role: MessageRole.USER,
+      content: data.message,
+      mode: conversation.mode,
+      timestamp: new Date(),
+    });
 
-      case CoachingMode.CRISIS:
-        return `I hear the urgency in what you're sharing, and I want you to know you're not alone in this.${contextNote}First, take a breath. Now, let's focus on what you can control right now in this moment. What's the most immediate thing that needs your attention? We'll take this one step at a time.`;
+    try {
+      const systemPrompt = this.buildSystemPrompt(
+        conversation.mode,
+        conversation.fiveDialsContext,
+      );
+      const apiMessages = conversation.messages
+        .filter((m) => m.role !== MessageRole.SYSTEM)
+        .map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }));
+
+      const stream = this.anthropic.messages.stream({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: apiMessages,
+      });
+
+      let fullContent = '';
+
+      for await (const event of stream) {
+        if (
+          event.type === 'content_block_delta' &&
+          event.delta.type === 'text_delta'
+        ) {
+          fullContent += event.delta.text;
+          yield event.delta.text;
+        }
+      }
+
+      // Store assistant message
+      conversation.messages.push({
+        id: uuidv4(),
+        role: MessageRole.ASSISTANT,
+        content: fullContent,
+        mode: conversation.mode,
+        timestamp: new Date(),
+      });
+      conversation.updatedAt = new Date();
+
+      // Yield conversation metadata at the end
+      yield `\n[CONV_ID:${conversation.id}]`;
+    } catch (error) {
+      this.logger.error(`Streaming chat failed: ${error.message}`);
+      yield "I appreciate you sharing that. I'm experiencing a brief technical difficulty, but I'm here for you.";
     }
   }
 

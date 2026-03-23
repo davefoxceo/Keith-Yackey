@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Sunrise, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -39,9 +40,20 @@ export function DailyPrompt({ prompt, completed = false, onStart }: DailyPromptP
           )}
         </div>
 
-        <p className="text-white font-medium leading-relaxed mb-4 text-[15px]">
-          &ldquo;{prompt}&rdquo;
-        </p>
+        <div className="flex gap-3 mb-4">
+          <div className="shrink-0 w-8 h-8 rounded-full overflow-hidden ring-2 ring-amber-500/20 mt-0.5">
+            <Image
+              src="/images/keith/keith-orderofman.png"
+              alt="Coach Keith"
+              width={32}
+              height={32}
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <p className="text-white font-medium leading-relaxed text-[15px]">
+            &ldquo;{prompt}&rdquo;
+          </p>
+        </div>
 
         {!completed && (
           <Button

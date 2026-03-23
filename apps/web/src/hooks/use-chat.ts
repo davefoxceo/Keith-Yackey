@@ -68,6 +68,12 @@ export function useChat(options: UseChatOptions = {}) {
         let fullContent = "";
         for await (const chunk of stream) {
           const text = chunk.text || chunk.content || "";
+          // Check for conversation ID metadata
+          if (text.startsWith("\n[CONV_ID:")) {
+            const match = text.match(/\[CONV_ID:(.+?)\]/);
+            if (match) setConversationId(match[1]);
+            continue;
+          }
           fullContent += text;
           setMessages((prev) =>
             prev.map((msg) =>
@@ -76,10 +82,6 @@ export function useChat(options: UseChatOptions = {}) {
                 : msg
             )
           );
-        }
-
-        if (!conversationId) {
-          setConversationId(`conv-${Date.now()}`);
         }
       } catch (error) {
         console.error("Chat error:", error);

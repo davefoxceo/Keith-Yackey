@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Crown,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/lib/auth";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -22,6 +24,8 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const { register } = useAuth();
+  const router = useRouter();
 
   const passwordStrength = (() => {
     if (password.length === 0) return 0;
@@ -42,10 +46,18 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      window.location.href = "/dashboard";
-    } catch {
-      setError("Something went wrong. Please try again.");
+      await register(name, email, password);
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong.";
+      setError(
+        message.includes("409")
+          ? "An account with this email already exists."
+          : message.includes("400")
+            ? "Password must have 8+ chars with uppercase, lowercase, and a number."
+            : "Something went wrong. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }

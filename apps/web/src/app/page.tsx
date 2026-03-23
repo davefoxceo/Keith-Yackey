@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Crown,
   ArrowRight,
@@ -227,23 +228,40 @@ export default function LandingPage() {
               </Button>
             </motion.div>
 
+            {/* Keith's face as trust element */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="mt-10 flex items-center justify-center gap-6 text-sm text-slate-500"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-10 flex flex-col items-center gap-4"
             >
-              <div className="flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-500" />
-                <span>7-day free trial</span>
+              <div className="flex items-center gap-3 p-2 pr-5 rounded-full border border-slate-800 bg-surface-raised/60">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-500/40">
+                  <Image
+                    src="/images/keith/keith-orderofman.png"
+                    alt="Keith Yackey"
+                    width={40}
+                    height={40}
+                    className="object-cover"
+                  />
+                </div>
+                <span className="text-sm text-slate-300">
+                  Built by <span className="text-amber-400 font-semibold">Keith Yackey</span> — coach to thousands of men
+                </span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-500" />
-                <span>Cancel anytime</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-500" />
-                <span>100% private</span>
+              <div className="flex items-center gap-6 text-sm text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-emerald-500" />
+                  <span>7-day free trial</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-emerald-500" />
+                  <span>Cancel anytime</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-emerald-500" />
+                  <span>100% private</span>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -382,24 +400,43 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-surface-raised to-surface border border-slate-800 overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-amber-500/30">
-                      <Crown className="w-12 h-12 text-slate-900" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Keith Yackey</h3>
-                    <p className="text-amber-400 font-medium mb-4">Husband. Father. Coach.</p>
-                    <p className="text-sm text-slate-500 max-w-xs mx-auto">
-                      Host of a top men&apos;s coaching podcast. Transformed
-                      thousands of marriages through the Five Dials framework.
-                    </p>
-                  </div>
+              {/* Main Keith photo */}
+              <div className="aspect-[4/5] rounded-3xl border border-slate-800 overflow-hidden relative">
+                <Image
+                  src="/images/keith/keith-loriharder-episode.png"
+                  alt="Keith Yackey - Founder of The Married Game"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <h3 className="text-2xl font-bold text-white mb-1">Keith Yackey</h3>
+                  <p className="text-amber-400 font-medium mb-2">Husband. Father. Coach. Provocateur.</p>
+                  <p className="text-sm text-slate-400">
+                    &ldquo;The World&apos;s Most Expensive Relationship Coach&rdquo;
+                  </p>
                 </div>
                 {/* Decorative elements */}
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-amber-500/5 rounded-full blur-3xl" />
               </div>
+
+              {/* Keith & Jesse podcast artwork - smaller, overlapping */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="absolute -bottom-8 -right-8 w-44 h-44 rounded-2xl border-4 border-brand-navy shadow-2xl overflow-hidden"
+              >
+                <Image
+                  src="/images/keith/podcast-artwork.jpg"
+                  alt="Keith & Jesse - Married Game Podcast"
+                  fill
+                  className="object-cover"
+                  sizes="176px"
+                />
+              </motion.div>
             </motion.div>
           </div>
         </div>

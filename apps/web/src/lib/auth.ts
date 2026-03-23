@@ -50,7 +50,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setState({ user: null, isLoading: false, isAuthenticated: false });
         return;
       }
-      const user = await api.get<User>("/auth/me");
+      const data = await api.get<{
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        createdAt: string;
+      }>("/auth/me");
+      const user: User = {
+        id: data.id,
+        email: data.email,
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        tier: "free",
+        streak: 0,
+        joinedAt: data.createdAt,
+      };
       setState({ user, isLoading: false, isAuthenticated: true });
     } catch {
       localStorage.removeItem("auth_token");
@@ -63,23 +77,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshUser]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const response = await api.post<{ token: string; user: User }>(
-      "/auth/login",
-      { email, password }
-    );
-    localStorage.setItem("auth_token", response.token);
-    setState({ user: response.user, isLoading: false, isAuthenticated: true });
+    const response = await api.post<{
+      accessToken: string;
+      user: { id: string; email: string; firstName: string; lastName: string };
+    }>("/auth/login", { email, password });
+    localStorage.setItem("auth_token", response.accessToken);
+    setState({
+      user: {
+        id: response.user.id,
+        email: response.user.email,
+        name: `${response.user.firstName} ${response.user.lastName}`.trim(),
+        tier: "free",
+        streak: 0,
+        joinedAt: new Date().toISOString(),
+      },
+      isLoading: false,
+      isAuthenticated: true,
+    });
   }, []);
 
   const register = useCallback(
     async (name: string, email: string, password: string) => {
-      const response = await api.post<{ token: string; user: User }>(
-        "/auth/register",
-        { name, email, password }
-      );
-      localStorage.setItem("auth_token", response.token);
+      const [firstName, ...lastParts] = name.trim().split(" ");
+      const lastName = lastParts.join(" ") || firstName;
+      const response = await api.post<{
+        accessToken: string;
+        user: { id: string; email: string; firstName: string; lastName: string };
+      }>("/auth/register", {
+        email,
+        password,
+        firstName,
+        lastName,
+      });
+      localStorage.setItem("auth_token", response.accessToken);
       setState({
-        user: response.user,
+        user: {
+          id: response.user.id,
+          email: response.user.email,
+          name: `${response.user.firstName} ${response.user.lastName}`.trim(),
+          tier: "free",
+          streak: 0,
+          joinedAt: new Date().toISOString(),
+        },
         isLoading: false,
         isAuthenticated: true,
       });

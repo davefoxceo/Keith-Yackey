@@ -14,11 +14,11 @@ import {
 
 interface TrendDataPoint {
   date: string;
-  fitness: number;
-  faith: number;
-  finances: number;
-  family: number;
-  fun: number;
+  parent: number;
+  partner: number;
+  producer: number;
+  player: number;
+  power: number;
 }
 
 interface TrendChartProps {
@@ -26,11 +26,11 @@ interface TrendChartProps {
 }
 
 const dialColors: Record<string, string> = {
-  fitness: "#f59e0b",
-  faith: "#8b5cf6",
-  finances: "#10b981",
-  family: "#3b82f6",
-  fun: "#ec4899",
+  parent: "#8b5cf6",
+  partner: "#ec4899",
+  producer: "#3b82f6",
+  player: "#10b981",
+  power: "#f59e0b",
 };
 
 export function TrendChart({ data }: TrendChartProps) {
