@@ -20,7 +20,8 @@ import {
   textToVector,
   type SearchResult,
 } from './vector-store';
-import { KEITH_CONTENT_SEEDS } from './seeds/keith-content';
+import { KEITH_CONTENT_SEEDS as FRAMEWORK_SEEDS } from './seeds/keith-content';
+import { KEITH_CONTENT_SEEDS as PODCAST_SEEDS } from './seeds/keith-content-generated';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,7 +86,10 @@ export class LearningService implements OnModuleInit {
   // -----------------------------------------------------------------------
 
   private seedKeithContent(): void {
-    for (const seed of KEITH_CONTENT_SEEDS) {
+    // Combine hand-written frameworks + generated podcast content
+    const allSeeds = [...FRAMEWORK_SEEDS, ...PODCAST_SEEDS];
+
+    for (const seed of allSeeds) {
       const vector = textToVector(seed.text);
       this.contentStore.store({
         id: seed.id,
