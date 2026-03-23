@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import Anthropic from '@anthropic-ai/sdk';
+import { LearningService, type RAGContext } from '../learning/learning.service';
 
 export enum CoachingMode {
   COACH = 'coach',
@@ -48,7 +49,10 @@ export class CoachingService {
   private conversations: Map<string, Conversation> = new Map();
   private anthropic: Anthropic;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly learningService: LearningService,
+  ) {
     this.anthropic = new Anthropic({
       apiKey: this.configService.get<string>('ANTHROPIC_API_KEY'),
     });
@@ -65,7 +69,7 @@ export class CoachingService {
     const conversationId = uuidv4();
     const mode = data.mode || CoachingMode.COACH;
 
-    const systemPrompt = this.buildSystemPrompt(mode, data.fiveDialsContext);
+    const systemPrompt = this.buildSystemPromptWithRAG(mode, data.fiveDialsContext);
     const messages: Message[] = [
       {
         id: uuidv4(),
@@ -90,6 +94,7 @@ export class CoachingService {
         messages,
         mode,
         data.fiveDialsContext,
+        userId,
       );
       messages.push({
         id: uuidv4(),
@@ -186,11 +191,12 @@ export class CoachingService {
     };
     conversation.messages.push(userMessage);
 
-    // Generate AI response using the conversation context
+    // Generate AI response using the conversation context + RAG
     const aiResponseContent = await this.generateResponse(
       conversation.messages,
       conversation.mode,
       conversation.fiveDialsContext,
+      userId,
     );
 
     const assistantMessage: Message = {
@@ -210,6 +216,9 @@ export class CoachingService {
     if (userMessages.length === 1) {
       conversation.title = this.generateTitle(content);
     }
+
+    // Store conversation embedding for future RAG retrieval (user-scoped)
+    this.storeConversationForLearning(userId, conversation);
 
     this.logger.log(
       `Message processed in conversation ${conversationId}: ${content.substring(0, 50)}...`,
@@ -251,7 +260,7 @@ export class CoachingService {
     const modeChangeMessage: Message = {
       id: uuidv4(),
       role: MessageRole.SYSTEM,
-      content: this.buildSystemPrompt(newMode, conversation.fiveDialsContext),
+      content: this.buildSystemPromptWithRAG(newMode, conversation.fiveDialsContext),
       mode: newMode,
       timestamp: new Date(),
     };
@@ -319,9 +328,16 @@ export class CoachingService {
     messages: Message[],
     mode: CoachingMode,
     fiveDialsContext?: Record<string, number>,
+    userId?: string,
   ): Promise<string> {
     try {
-      const systemPrompt = this.buildSystemPrompt(mode, fiveDialsContext);
+      // Get RAG context: Keith's content + user's past conversations (user-scoped)
+      const lastUserMsg = [...messages].reverse().find((m) => m.role === MessageRole.USER);
+      const ragContext = userId && lastUserMsg
+        ? this.learningService.getRAGContext(userId, lastUserMsg.content)
+        : null;
+
+      const systemPrompt = this.buildSystemPromptWithRAG(mode, fiveDialsContext, ragContext);
       const apiMessages = messages
         .filter((m) => m.role !== MessageRole.SYSTEM)
         .map((m) => ({
@@ -371,7 +387,7 @@ export class CoachingService {
           {
             id: uuidv4(),
             role: MessageRole.SYSTEM,
-            content: this.buildSystemPrompt(mode),
+            content: this.buildSystemPromptWithRAG(mode),
             mode,
             timestamp: new Date(),
           },
@@ -392,9 +408,12 @@ export class CoachingService {
     });
 
     try {
-      const systemPrompt = this.buildSystemPrompt(
+      // RAG: retrieve Keith content + user's own past conversations
+      const ragContext = this.learningService.getRAGContext(userId, data.message);
+      const systemPrompt = this.buildSystemPromptWithRAG(
         conversation.mode,
         conversation.fiveDialsContext,
+        ragContext,
       );
       const apiMessages = conversation.messages
         .filter((m) => m.role !== MessageRole.SYSTEM)
@@ -432,6 +451,9 @@ export class CoachingService {
       });
       conversation.updatedAt = new Date();
 
+      // Store conversation embedding for future RAG retrieval (user-scoped)
+      this.storeConversationForLearning(userId, conversation);
+
       // Yield conversation metadata at the end
       yield `\n[CONV_ID:${conversation.id}]`;
     } catch (error) {
@@ -440,9 +462,18 @@ export class CoachingService {
     }
   }
 
-  private buildSystemPrompt(
+  /**
+   * Build system prompt with RAG context injected.
+   *
+   * RAG context includes:
+   * - Keith's relevant coaching content (shared)
+   * - User's relevant past conversations (user-scoped, NEVER another user's)
+   * - Learning notes from user's feedback history
+   */
+  private buildSystemPromptWithRAG(
     mode: CoachingMode,
     fiveDialsContext?: Record<string, number>,
+    ragContext?: RAGContext | null,
   ): string {
     const basePrompt = `You are Coach Keith — a direct, empathetic, and no-BS coach for men. You speak from decades of experience helping men become better husbands and fathers. Your framework centers on the Five Dials: Parent, Partner, Producer, Player, and Power. You are warm but challenging, never enabling, and always pushing men toward growth and accountability.`;
 
@@ -452,14 +483,51 @@ export class CoachingService {
 
     const modePrompts: Record<CoachingMode, string> = {
       [CoachingMode.COACH]: `\n\nYou are in COACHING mode. Ask probing questions, help the user identify patterns, and guide them to their own insights. Use the Socratic method. Focus on awareness and understanding.`,
-      [CoachingMode.MENTOR]: `\n\nYou are in MENTORING mode. Share wisdom, frameworks, and stories from your coaching experience. Be more directive and offer specific advice and strategies. Draw from Keith's book and podcast content.`,
+      [CoachingMode.MENTOR]: `\n\nYou are in MENTORING mode. Share wisdom, frameworks, and stories from your coaching experience. Be more directive and offer specific advice and strategies. Draw from the content and frameworks below.`,
       [CoachingMode.ACCOUNTABILITY]: `\n\nYou are in ACCOUNTABILITY mode. Be direct and firm. Check on commitments, challenge excuses, and push for specific, measurable actions. Don't let the user off the hook. Track progress against goals.`,
       [CoachingMode.CRISIS]: `\n\nYou are in CRISIS mode. The user is dealing with an urgent situation. Be compassionate but grounded. Help stabilize emotions first, then move to practical next steps. If the situation involves danger, recommend professional resources.`,
     };
 
-    return basePrompt + contextPrompt + modePrompts[mode];
+    let ragPrompt = '';
+
+    if (ragContext) {
+      // Inject Keith's relevant content (shared teaching material)
+      if (ragContext.keithContent.length > 0) {
+        ragPrompt += '\n\n--- RELEVANT COACHING CONTENT (from Keith\'s teachings) ---';
+        for (const content of ragContext.keithContent) {
+          ragPrompt += `\n\n[${content.topic}]: ${content.text}`;
+        }
+        ragPrompt += '\n\n--- END CONTENT ---';
+        ragPrompt += '\nUse the above content naturally in your response when relevant. Don\'t quote it verbatim — weave it into your coaching voice.';
+      }
+
+      // Inject relevant past conversations (THIS user's only)
+      if (ragContext.pastConversations.length > 0) {
+        ragPrompt += '\n\n--- CONTEXT FROM PAST CONVERSATIONS WITH THIS USER ---';
+        for (const conv of ragContext.pastConversations) {
+          ragPrompt += `\n- ${conv.summary}`;
+        }
+        ragPrompt += '\n--- END PAST CONTEXT ---';
+        ragPrompt += '\nReference past conversations naturally when relevant (e.g., "We talked about this before..." or "Last time you mentioned...").';
+      }
+
+      // Inject learning notes from feedback
+      if (ragContext.learningNotes.length > 0) {
+        ragPrompt += '\n\n--- COACHING NOTES (from learning system) ---';
+        for (const note of ragContext.learningNotes) {
+          ragPrompt += `\n- ${note}`;
+        }
+        ragPrompt += '\n--- END NOTES ---';
+      }
+    }
+
+    return basePrompt + contextPrompt + modePrompts[mode] + ragPrompt;
   }
 
+  /**
+   * Record a feedback signal into the learning system.
+   * The signal is stored USER-SCOPED and used to improve future responses.
+   */
   private async recordLearningSignal(signal: {
     conversationId: string;
     messageId: string;
@@ -469,16 +537,54 @@ export class CoachingService {
     responseContent: string;
     userId: string;
   }) {
-    // In production, this feeds into the SONA adaptive learning system via Ruvector
-    // const ruvectorPath = this.configService.get<string>('RUVECTOR_PATH');
-    // await ruvectorClient.recordFeedback({
-    //   vector: await ruvectorClient.embed(signal.responseContent),
-    //   score: signal.score,
-    //   metadata: { mode: signal.mode, userId: signal.userId },
-    // });
+    this.learningService.recordFeedbackSignal({
+      messageId: signal.messageId,
+      conversationId: signal.conversationId,
+      userId: signal.userId,
+      score: signal.score,
+      responseText: signal.responseContent,
+      mode: signal.mode,
+      timestamp: new Date().toISOString(),
+    });
+
     this.logger.log(
       `Learning signal recorded: conversation=${signal.conversationId}, score=${signal.score}, mode=${signal.mode}`,
     );
+  }
+
+  /**
+   * Store a conversation embedding for future RAG retrieval.
+   * Embeddings are USER-SCOPED — they can only be retrieved by the same user.
+   */
+  private storeConversationForLearning(
+    userId: string,
+    conversation: Conversation,
+  ): void {
+    const userMessages = conversation.messages
+      .filter((m) => m.role === MessageRole.USER)
+      .map((m) => m.content);
+    const assistantMessages = conversation.messages
+      .filter((m) => m.role === MessageRole.ASSISTANT)
+      .map((m) => m.content);
+
+    // Create a summary of the conversation for embedding
+    const summary = [
+      `Topic: ${conversation.title}`,
+      `Mode: ${conversation.mode}`,
+      `User discussed: ${userMessages.slice(-2).join(' ')}`,
+      `Keith advised: ${assistantMessages.slice(-1).map((m) => m.substring(0, 150)).join(' ')}`,
+    ].join('. ');
+
+    this.learningService.updateConversationEmbedding({
+      conversationId: conversation.id,
+      userId,
+      summary,
+      mode: conversation.mode,
+      messageCount: conversation.messages.filter(
+        (m) => m.role !== MessageRole.SYSTEM,
+      ).length,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   private generateTitle(message: string): string {

@@ -11,6 +11,7 @@ import { ContentModule } from './modules/content/content.module';
 import { CommunityModule } from './modules/community/community.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { UserModule } from './modules/user/user.module';
+import { LearningModule } from './modules/learning/learning.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UserModule } from './modules/user/user.module';
         limit: 100,
       },
     ]),
+    LearningModule,
     AuthModule,
     CoachingModule,
     AssessmentModule,
