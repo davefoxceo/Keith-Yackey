@@ -22,6 +22,7 @@ import {
 } from './vector-store';
 import { KEITH_CONTENT_SEEDS as FRAMEWORK_SEEDS } from './seeds/keith-content';
 import { KEITH_CONTENT_SEEDS as PODCAST_SEEDS } from './seeds/keith-content-generated';
+import { PiBrainService } from './pi-brain.service';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -63,7 +64,7 @@ export interface RAGContext {
 export class LearningService implements OnModuleInit {
   private readonly logger = new Logger(LearningService.name);
 
-  // Three isolated stores
+  // Fallback in-memory stores (used when Pi-Brain is unavailable)
   private readonly contentStore = new InMemoryVectorStore();
   private readonly conversationStore = new InMemoryVectorStore();
   private readonly feedbackStore = new InMemoryVectorStore();
@@ -73,6 +74,8 @@ export class LearningService implements OnModuleInit {
     string,
     { positiveCount: number; negativeCount: number; preferredTopics: string[] }
   >();
+
+  constructor(private readonly piBrain: PiBrainService) {}
 
   async onModuleInit() {
     this.seedKeithContent();
@@ -117,13 +120,64 @@ export class LearningService implements OnModuleInit {
    *
    * This is the core RAG method called before every AI response.
    */
-  getRAGContext(userId: string, userMessage: string): RAGContext {
+  async getRAGContext(userId: string, userMessage: string): Promise<RAGContext> {
+    // Try Pi-Brain first (persistent, HNSW-indexed), fall back to in-memory
+    if (this.piBrain.isConnected) {
+      return this.getRAGContextFromPiBrain(userId, userMessage);
+    }
+    return this.getRAGContextFromMemory(userId, userMessage);
+  }
+
+  private async getRAGContextFromPiBrain(
+    userId: string,
+    userMessage: string,
+  ): Promise<RAGContext> {
+    // 1. Search Keith's coaching content (shared namespace)
+    const contentResult = await this.piBrain.searchCoachingContent(
+      userMessage,
+      1500,
+    );
+    const keithContent = contentResult.workingSet
+      ? [
+          {
+            id: 'pi-brain-rag',
+            text: contentResult.workingSet,
+            topic: 'Keith Yackey coaching content',
+            score: 1.0,
+          },
+        ]
+      : [];
+
+    // 2. Search user's past conversations (USER-SCOPED namespace)
+    const userContext = await this.piBrain.recallUserContext(
+      userId,
+      userMessage,
+      800,
+    );
+    const pastConversations = userContext
+      ? [{ id: 'pi-brain-user-context', summary: userContext, score: 1.0 }]
+      : [];
+
+    // 3. Learning notes from feedback history
+    const learningNotes = this.getLearningNotes(userId);
+
+    this.logger.debug(
+      `Pi-Brain RAG: ${keithContent.length} content entries, ${pastConversations.length} user entries`,
+    );
+
+    return { keithContent, pastConversations, learningNotes };
+  }
+
+  private getRAGContextFromMemory(
+    userId: string,
+    userMessage: string,
+  ): RAGContext {
     const queryVector = textToVector(userMessage);
 
     // 1. Search Keith's coaching content (shared)
     const contentResults = this.contentStore.search(queryVector, 3);
     const keithContent = contentResults
-      .filter((r) => r.score > 0.05) // minimum relevance threshold
+      .filter((r) => r.score > 0.05)
       .map((r) => ({
         id: r.id,
         text: r.metadata.text as string,
@@ -133,11 +187,7 @@ export class LearningService implements OnModuleInit {
 
     // 2. Search past conversations (USER-SCOPED — prefix filter)
     const userPrefix = `user:${userId}:`;
-    const convResults = this.conversationStore.search(
-      queryVector,
-      3,
-      userPrefix, // <-- THIS is the user isolation filter
-    );
+    const convResults = this.conversationStore.search(queryVector, 3, userPrefix);
     const pastConversations = convResults
       .filter((r) => r.score > 0.1)
       .map((r) => ({
@@ -146,7 +196,7 @@ export class LearningService implements OnModuleInit {
         score: r.score,
       }));
 
-    // 3. Generate learning notes from feedback history
+    // 3. Learning notes
     const learningNotes = this.getLearningNotes(userId);
 
     return { keithContent, pastConversations, learningNotes };
@@ -163,9 +213,25 @@ export class LearningService implements OnModuleInit {
    * can ONLY be retrieved when searching with that user's prefix.
    */
   storeConversationEmbedding(data: ConversationEmbedding): void {
+    // Store in Pi-Brain (persistent) if available
+    if (this.piBrain.isConnected) {
+      // Fire and forget — don't block the response
+      this.piBrain
+        .storeConversation(
+          data.userId,
+          data.conversationId,
+          data.summary,
+          '',
+          data.mode,
+        )
+        .catch((e) =>
+          this.logger.error(`Pi-Brain store failed: ${e.message}`),
+        );
+    }
+
+    // Always store in memory too (for immediate recall within same session)
     const id = `user:${data.userId}:conv:${data.conversationId}`;
     const vector = textToVector(data.summary);
-
     this.conversationStore.store({
       id,
       vector,
@@ -186,11 +252,9 @@ export class LearningService implements OnModuleInit {
 
   /**
    * Update a conversation embedding as more messages are exchanged.
-   * Replaces the previous embedding with a new one containing the full context.
    */
   updateConversationEmbedding(data: ConversationEmbedding): void {
     const id = `user:${data.userId}:conv:${data.conversationId}`;
-    // Delete old entry and store new one
     this.conversationStore.delete(id);
     this.storeConversationEmbedding(data);
   }
@@ -208,6 +272,23 @@ export class LearningService implements OnModuleInit {
    * Entry is keyed as `user:{userId}:fb:{messageId}` — user-scoped.
    */
   recordFeedbackSignal(data: FeedbackSignal): void {
+    // Persist to Pi-Brain if available
+    if (this.piBrain.isConnected) {
+      this.piBrain
+        .recordFeedback(
+          data.userId,
+          data.conversationId,
+          data.messageId,
+          data.score,
+          data.responseText,
+          data.mode,
+        )
+        .catch((e) =>
+          this.logger.error(`Pi-Brain feedback failed: ${e.message}`),
+        );
+    }
+
+    // Also store in memory
     const id = `user:${data.userId}:fb:${data.messageId}`;
     const vector = textToVector(data.responseText);
 

@@ -334,7 +334,7 @@ export class CoachingService {
       // Get RAG context: Keith's content + user's past conversations (user-scoped)
       const lastUserMsg = [...messages].reverse().find((m) => m.role === MessageRole.USER);
       const ragContext = userId && lastUserMsg
-        ? this.learningService.getRAGContext(userId, lastUserMsg.content)
+        ? await this.learningService.getRAGContext(userId, lastUserMsg.content)
         : null;
 
       const systemPrompt = this.buildSystemPromptWithRAG(mode, fiveDialsContext, ragContext);
@@ -409,7 +409,7 @@ export class CoachingService {
 
     try {
       // RAG: retrieve Keith content + user's own past conversations
-      const ragContext = this.learningService.getRAGContext(userId, data.message);
+      const ragContext = await this.learningService.getRAGContext(userId, data.message);
       const systemPrompt = this.buildSystemPromptWithRAG(
         conversation.mode,
         conversation.fiveDialsContext,
