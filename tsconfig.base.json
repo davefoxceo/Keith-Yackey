@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@coach-keith/shared": ["./packages/shared/src"],
+      "@coach-keith/shared/*": ["./packages/shared/src/*"],
+      "@coach-keith/ai-engine": ["./packages/ai-engine/src"],
+      "@coach-keith/ai-engine/*": ["./packages/ai-engine/src/*"],
+      "@coach-keith/ruvector-client": ["./packages/ruvector-client/src"],
+      "@coach-keith/ruvector-client/*": ["./packages/ruvector-client/src/*"],
+      "@coach-keith/ui": ["./packages/ui/src"],
+      "@coach-keith/ui/*": ["./packages/ui/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".next", ".expo"]
+}

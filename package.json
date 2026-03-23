@@ -1,0 +1,37 @@
+{
+  "name": "coach-keith-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:mobile": "cd apps/mobile && npx expo start",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:mobile": "cd apps/mobile && npx expo export",
+    "test:all": "turbo test --parallel",
+    "pipeline:catalog": "npm run catalog --workspace=tools/content-pipeline",
+    "pipeline:transcribe": "npm run transcribe --workspace=tools/content-pipeline",
+    "pipeline:embed": "npm run embed --workspace=tools/content-pipeline"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0",
+    "prettier": "^3.5.0",
+    "eslint": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.9.3"
+}
