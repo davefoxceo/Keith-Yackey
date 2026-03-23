@@ -1,10 +1,10 @@
 import { Module, Global } from '@nestjs/common';
 import { LearningService } from './learning.service';
-import { PiBrainService } from './pi-brain.service';
+import { RuvectorService } from './ruvector.service';
 
 @Global()
 @Module({
-  providers: [LearningService, PiBrainService],
-  exports: [LearningService, PiBrainService],
+  providers: [LearningService, RuvectorService],
+  exports: [LearningService, RuvectorService],
 })
 export class LearningModule {}

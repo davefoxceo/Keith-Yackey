@@ -15,14 +15,9 @@
  */
 
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import {
-  InMemoryVectorStore,
-  textToVector,
-  type SearchResult,
-} from './vector-store';
 import { KEITH_CONTENT_SEEDS as FRAMEWORK_SEEDS } from './seeds/keith-content';
 import { KEITH_CONTENT_SEEDS as PODCAST_SEEDS } from './seeds/keith-content-generated';
-import { PiBrainService } from './pi-brain.service';
+import { RuvectorService } from './ruvector.service';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -64,10 +59,8 @@ export interface RAGContext {
 export class LearningService implements OnModuleInit {
   private readonly logger = new Logger(LearningService.name);
 
-  // Fallback in-memory stores (used when Pi-Brain is unavailable)
-  private readonly contentStore = new InMemoryVectorStore();
-  private readonly conversationStore = new InMemoryVectorStore();
-  private readonly feedbackStore = new InMemoryVectorStore();
+  // Metadata store (text content keyed by vector ID, for RAG retrieval)
+  private metadata = new Map<string, Record<string, unknown>>();
 
   // Track feedback patterns per user for response adjustment
   private userFeedbackStats = new Map<
@@ -75,12 +68,15 @@ export class LearningService implements OnModuleInit {
     { positiveCount: number; negativeCount: number; preferredTopics: string[] }
   >();
 
-  constructor(private readonly piBrain: PiBrainService) {}
+  constructor(private readonly ruvector: RuvectorService) {}
 
   async onModuleInit() {
-    this.seedKeithContent();
+    // Wait for ruvector to initialize, then seed if empty
+    await new Promise((r) => setTimeout(r, 500));
+    await this.seedKeithContent();
+    const count = await this.ruvector.count();
     this.logger.log(
-      `LearningService initialized: ${this.contentStore.count()} content entries seeded`,
+      `LearningService initialized: ${count} vectors in Ruvector`,
     );
   }
 
@@ -88,21 +84,50 @@ export class LearningService implements OnModuleInit {
   // Content Seeding (shared, read-only)
   // -----------------------------------------------------------------------
 
-  private seedKeithContent(): void {
-    // Combine hand-written frameworks + generated podcast content
+  private async seedKeithContent(): Promise<void> {
+    if (!this.ruvector.isReady) {
+      this.logger.warn('Ruvector not ready — content will seed on next restart');
+      return;
+    }
+
+    // Check if content is already seeded (persisted in REDB)
+    const existing = await this.ruvector.get('content:framework:five-dials-overview');
+    if (existing) {
+      const count = await this.ruvector.count();
+      this.logger.log(`Content already seeded (${count} vectors in REDB)`);
+      // Still load metadata map for RAG text retrieval
+      this.loadMetadataMap();
+      return;
+    }
+
+    // First run: seed all content
     const allSeeds = [...FRAMEWORK_SEEDS, ...PODCAST_SEEDS];
+    let stored = 0;
 
     for (const seed of allSeeds) {
-      const vector = textToVector(seed.text);
-      this.contentStore.store({
-        id: seed.id,
-        vector,
-        metadata: {
-          text: seed.text,
-          sourceType: seed.sourceType,
-          dial: seed.dial,
-          topic: seed.topic,
-        },
+      const id = `content:${seed.id}`;
+      const vector = this.ruvector.textToVector(seed.text);
+      await this.ruvector.store(id, vector);
+      this.metadata.set(id, {
+        text: seed.text,
+        sourceType: seed.sourceType,
+        dial: seed.dial,
+        topic: seed.topic,
+      });
+      stored++;
+    }
+
+    this.logger.log(`Seeded ${stored} content entries into Ruvector (REDB persisted)`);
+  }
+
+  private loadMetadataMap(): void {
+    const allSeeds = [...FRAMEWORK_SEEDS, ...PODCAST_SEEDS];
+    for (const seed of allSeeds) {
+      this.metadata.set(`content:${seed.id}`, {
+        text: seed.text,
+        sourceType: seed.sourceType,
+        dial: seed.dial,
+        topic: seed.topic,
       });
     }
   }
@@ -121,83 +146,40 @@ export class LearningService implements OnModuleInit {
    * This is the core RAG method called before every AI response.
    */
   async getRAGContext(userId: string, userMessage: string): Promise<RAGContext> {
-    // Try Pi-Brain first (persistent, HNSW-indexed), fall back to in-memory
-    if (this.piBrain.isConnected) {
-      return this.getRAGContextFromPiBrain(userId, userMessage);
-    }
-    return this.getRAGContextFromMemory(userId, userMessage);
-  }
+    const queryVector = this.ruvector.textToVector(userMessage);
 
-  private async getRAGContextFromPiBrain(
-    userId: string,
-    userMessage: string,
-  ): Promise<RAGContext> {
-    // 1. Search Keith's coaching content (shared namespace)
-    const contentResult = await this.piBrain.searchCoachingContent(
-      userMessage,
-      1500,
-    );
-    const keithContent = contentResult.workingSet
-      ? [
-          {
-            id: 'pi-brain-rag',
-            text: contentResult.workingSet,
-            topic: 'Keith Yackey coaching content',
-            score: 1.0,
-          },
-        ]
-      : [];
+    // 1. Search Keith's coaching content (shared — "content:" prefix)
+    const contentResults = await this.ruvector.search(queryVector, 3, 'content:');
+    const keithContent = contentResults
+      .map((r) => {
+        const meta = this.metadata.get(r.id);
+        return {
+          id: r.id,
+          text: (meta?.text as string) || '',
+          topic: (meta?.topic as string) || r.id,
+          score: r.score,
+        };
+      })
+      .filter((r) => r.text.length > 0);
 
-    // 2. Search user's past conversations (USER-SCOPED namespace)
-    const userContext = await this.piBrain.recallUserContext(
-      userId,
-      userMessage,
-      800,
-    );
-    const pastConversations = userContext
-      ? [{ id: 'pi-brain-user-context', summary: userContext, score: 1.0 }]
-      : [];
+    // 2. Search past conversations (USER-SCOPED — "user:{userId}:" prefix)
+    const userPrefix = `user:${userId}:`;
+    const convResults = await this.ruvector.search(queryVector, 3, userPrefix);
+    const pastConversations = convResults.map((r) => {
+      const meta = this.metadata.get(r.id);
+      return {
+        id: r.id,
+        summary: (meta?.summary as string) || '',
+        score: r.score,
+      };
+    }).filter((r) => r.summary.length > 0);
 
     // 3. Learning notes from feedback history
     const learningNotes = this.getLearningNotes(userId);
 
     this.logger.debug(
-      `Pi-Brain RAG: ${keithContent.length} content entries, ${pastConversations.length} user entries`,
+      `Ruvector RAG: ${keithContent.length} content, ${pastConversations.length} user conversations`,
     );
-
-    return { keithContent, pastConversations, learningNotes };
-  }
-
-  private getRAGContextFromMemory(
-    userId: string,
-    userMessage: string,
-  ): RAGContext {
-    const queryVector = textToVector(userMessage);
-
-    // 1. Search Keith's coaching content (shared)
-    const contentResults = this.contentStore.search(queryVector, 3);
-    const keithContent = contentResults
-      .filter((r) => r.score > 0.05)
-      .map((r) => ({
-        id: r.id,
-        text: r.metadata.text as string,
-        topic: r.metadata.topic as string,
-        score: r.score,
-      }));
-
-    // 2. Search past conversations (USER-SCOPED — prefix filter)
-    const userPrefix = `user:${userId}:`;
-    const convResults = this.conversationStore.search(queryVector, 3, userPrefix);
-    const pastConversations = convResults
-      .filter((r) => r.score > 0.1)
-      .map((r) => ({
-        id: r.id,
-        summary: r.metadata.summary as string,
-        score: r.score,
-      }));
-
-    // 3. Learning notes
-    const learningNotes = this.getLearningNotes(userId);
 
     return { keithContent, pastConversations, learningNotes };
   }
@@ -213,36 +195,22 @@ export class LearningService implements OnModuleInit {
    * can ONLY be retrieved when searching with that user's prefix.
    */
   storeConversationEmbedding(data: ConversationEmbedding): void {
-    // Store in Pi-Brain (persistent) if available
-    if (this.piBrain.isConnected) {
-      // Fire and forget — don't block the response
-      this.piBrain
-        .storeConversation(
-          data.userId,
-          data.conversationId,
-          data.summary,
-          '',
-          data.mode,
-        )
-        .catch((e) =>
-          this.logger.error(`Pi-Brain store failed: ${e.message}`),
-        );
-    }
-
-    // Always store in memory too (for immediate recall within same session)
     const id = `user:${data.userId}:conv:${data.conversationId}`;
-    const vector = textToVector(data.summary);
-    this.conversationStore.store({
-      id,
-      vector,
-      metadata: {
-        conversationId: data.conversationId,
-        userId: data.userId,
-        summary: data.summary,
-        mode: data.mode,
-        messageCount: data.messageCount,
-        timestamp: data.timestamp,
-      },
+    const vector = this.ruvector.textToVector(data.summary);
+
+    // Store in Ruvector (REDB-persisted, survives restarts)
+    this.ruvector.store(id, vector).catch((e) =>
+      this.logger.error(`Ruvector store failed: ${e.message}`),
+    );
+
+    // Store metadata for retrieval
+    this.metadata.set(id, {
+      conversationId: data.conversationId,
+      userId: data.userId,
+      summary: data.summary,
+      mode: data.mode,
+      messageCount: data.messageCount,
+      timestamp: data.timestamp,
     });
 
     this.logger.debug(
@@ -255,7 +223,7 @@ export class LearningService implements OnModuleInit {
    */
   updateConversationEmbedding(data: ConversationEmbedding): void {
     const id = `user:${data.userId}:conv:${data.conversationId}`;
-    this.conversationStore.delete(id);
+    this.ruvector.delete(id).catch(() => {});
     this.storeConversationEmbedding(data);
   }
 
@@ -272,38 +240,23 @@ export class LearningService implements OnModuleInit {
    * Entry is keyed as `user:{userId}:fb:{messageId}` — user-scoped.
    */
   recordFeedbackSignal(data: FeedbackSignal): void {
-    // Persist to Pi-Brain if available
-    if (this.piBrain.isConnected) {
-      this.piBrain
-        .recordFeedback(
-          data.userId,
-          data.conversationId,
-          data.messageId,
-          data.score,
-          data.responseText,
-          data.mode,
-        )
-        .catch((e) =>
-          this.logger.error(`Pi-Brain feedback failed: ${e.message}`),
-        );
-    }
-
-    // Also store in memory
     const id = `user:${data.userId}:fb:${data.messageId}`;
-    const vector = textToVector(data.responseText);
+    const vector = this.ruvector.textToVector(data.responseText);
 
-    this.feedbackStore.store({
-      id,
-      vector,
-      metadata: {
-        messageId: data.messageId,
-        conversationId: data.conversationId,
-        userId: data.userId,
-        score: data.score,
-        mode: data.mode,
-        responseSnippet: data.responseText.substring(0, 200),
-        timestamp: data.timestamp,
-      },
+    // Store in Ruvector (REDB-persisted)
+    this.ruvector.store(id, vector).catch((e) =>
+      this.logger.error(`Ruvector feedback store failed: ${e.message}`),
+    );
+
+    // Store metadata
+    this.metadata.set(id, {
+      messageId: data.messageId,
+      conversationId: data.conversationId,
+      userId: data.userId,
+      score: data.score,
+      mode: data.mode,
+      responseSnippet: data.responseText.substring(0, 200),
+      timestamp: data.timestamp,
     });
 
     // Update per-user feedback stats
@@ -358,15 +311,16 @@ export class LearningService implements OnModuleInit {
       );
     }
 
-    // Search for highly-rated past responses to understand preferences
-    const userPrefix = `user:${userId}:fb:`;
-    const allFeedback = this.feedbackStore.getByPrefix(userPrefix);
-    const positiveFeedback = allFeedback.filter(
-      (f) => (f.metadata.score as number) >= 4,
-    );
-    const negativeFeedback = allFeedback.filter(
-      (f) => (f.metadata.score as number) <= 2,
-    );
+    // Check metadata for feedback patterns
+    const positiveFeedback: Array<{ metadata: Record<string, unknown> }> = [];
+    const negativeFeedback: Array<{ metadata: Record<string, unknown> }> = [];
+    for (const [key, meta] of this.metadata) {
+      if (key.startsWith(`user:${userId}:fb:`) && meta.score != null) {
+        const entry = { metadata: meta };
+        if ((meta.score as number) >= 4) positiveFeedback.push(entry);
+        else if ((meta.score as number) <= 2) negativeFeedback.push(entry);
+      }
+    }
 
     if (positiveFeedback.length > 0) {
       const modes = positiveFeedback.map((f) => f.metadata.mode as string);
@@ -391,21 +345,27 @@ export class LearningService implements OnModuleInit {
   // Metrics
   // -----------------------------------------------------------------------
 
-  getMetrics() {
+  async getMetrics() {
+    const count = await this.ruvector.count();
     return {
-      contentEntries: this.contentStore.count(),
-      conversationEntries: this.conversationStore.count(),
-      feedbackEntries: this.feedbackStore.count(),
+      totalVectors: count,
+      metadataEntries: this.metadata.size,
       usersWithFeedback: this.userFeedbackStats.size,
+      storage: 'Ruvector REDB (native HNSW)',
     };
   }
 
   /** Get metrics scoped to a specific user. */
   getUserMetrics(userId: string) {
-    const prefix = `user:${userId}:`;
+    let conversations = 0;
+    let feedbackSignals = 0;
+    for (const key of this.metadata.keys()) {
+      if (key.startsWith(`user:${userId}:conv:`)) conversations++;
+      if (key.startsWith(`user:${userId}:fb:`)) feedbackSignals++;
+    }
     return {
-      conversations: this.conversationStore.count(prefix + 'conv:'),
-      feedbackSignals: this.feedbackStore.count(prefix + 'fb:'),
+      conversations,
+      feedbackSignals,
       stats: this.userFeedbackStats.get(userId) ?? null,
     };
   }
