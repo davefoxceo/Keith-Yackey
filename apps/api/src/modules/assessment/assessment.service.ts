@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { DataStore } from '../learning/data-store.service';
 
 export interface FiveDialsScores {
   parent: number;
@@ -41,8 +42,24 @@ export interface MicroChallenge {
 @Injectable()
 export class AssessmentService {
   private readonly logger = new Logger(AssessmentService.name);
-  private assessments: Map<string, FiveDialsAssessment[]> = new Map();
-  private challenges: Map<string, MicroChallenge[]> = new Map();
+
+  constructor(private readonly dataStore: DataStore) {}
+
+  private getUserAssessments(userId: string): FiveDialsAssessment[] {
+    return this.dataStore.get<FiveDialsAssessment[]>('assessments', userId) || [];
+  }
+
+  private saveUserAssessments(userId: string, assessments: FiveDialsAssessment[]): void {
+    this.dataStore.set('assessments', userId, assessments);
+  }
+
+  private getUserChallenges(userId: string): MicroChallenge[] {
+    return this.dataStore.get<MicroChallenge[]>('challenges', userId) || [];
+  }
+
+  private saveUserChallenges(userId: string, challenges: MicroChallenge[]): void {
+    this.dataStore.set('challenges', userId, challenges);
+  }
 
   private readonly DIAL_QUESTIONS: Record<keyof FiveDialsScores, string[]> = {
     parent: [
@@ -171,9 +188,9 @@ export class AssessmentService {
     };
 
     // Store assessment
-    const userAssessments = this.assessments.get(userId) || [];
+    const userAssessments = this.getUserAssessments(userId) || [];
     userAssessments.push(assessment);
-    this.assessments.set(userId, userAssessments);
+    this.saveUserAssessments(userId, userAssessments);
 
     // Generate new challenges based on lowest scoring dials
     await this.generateChallenges(userId, scores);
@@ -197,7 +214,7 @@ export class AssessmentService {
     page: number = 1,
     limit: number = 10,
   ) {
-    const userAssessments = (this.assessments.get(userId) || []).sort(
+    const userAssessments = (this.getUserAssessments(userId) || []).sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
 
@@ -214,7 +231,7 @@ export class AssessmentService {
   }
 
   async getCurrentScores(userId: string) {
-    const userAssessments = this.assessments.get(userId);
+    const userAssessments = this.getUserAssessments(userId);
     if (!userAssessments || userAssessments.length === 0) {
       return {
         hasAssessment: false,
@@ -237,7 +254,7 @@ export class AssessmentService {
   }
 
   async getHealthScore(userId: string) {
-    const userAssessments = this.assessments.get(userId);
+    const userAssessments = this.getUserAssessments(userId);
     if (!userAssessments || userAssessments.length === 0) {
       throw new NotFoundException('No assessments found. Please complete a Five Dials assessment first.');
     }
@@ -262,7 +279,7 @@ export class AssessmentService {
   }
 
   async getActiveChallenges(userId: string) {
-    const userChallenges = (this.challenges.get(userId) || []).filter(
+    const userChallenges = (this.getUserChallenges(userId) || []).filter(
       (c) => !c.completed && c.expiresAt > new Date(),
     );
 
@@ -276,7 +293,7 @@ export class AssessmentService {
         pointValue: c.pointValue,
         expiresAt: c.expiresAt,
       })),
-      completedToday: (this.challenges.get(userId) || []).filter(
+      completedToday: (this.getUserChallenges(userId) || []).filter(
         (c) =>
           c.completed &&
           c.completedAt &&
@@ -286,7 +303,7 @@ export class AssessmentService {
   }
 
   async completeChallenge(userId: string, challengeId: string) {
-    const userChallenges = this.challenges.get(userId) || [];
+    const userChallenges = this.getUserChallenges(userId) || [];
     const challenge = userChallenges.find((c) => c.id === challengeId);
 
     if (!challenge) {
@@ -337,7 +354,7 @@ export class AssessmentService {
   }
 
   private computeTrends(userId: string) {
-    const userAssessments = this.assessments.get(userId) || [];
+    const userAssessments = this.getUserAssessments(userId) || [];
     if (userAssessments.length < 2) {
       return null;
     }
@@ -462,8 +479,8 @@ export class AssessmentService {
       });
     }
 
-    const existing = this.challenges.get(userId) || [];
-    this.challenges.set(userId, [...existing, ...newChallenges]);
+    const existing = this.getUserChallenges(userId) || [];
+    this.saveUserChallenges(userId, [...existing, ...newChallenges]);
   }
 
   private isToday(date: Date): boolean {

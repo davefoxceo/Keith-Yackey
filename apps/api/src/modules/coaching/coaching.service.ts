@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import Anthropic from '@anthropic-ai/sdk';
 import { LearningService, type RAGContext } from '../learning/learning.service';
+import { DataStore } from '../learning/data-store.service';
 
 export enum CoachingMode {
   COACH = 'coach',
@@ -46,16 +47,24 @@ interface Conversation {
 @Injectable()
 export class CoachingService {
   private readonly logger = new Logger(CoachingService.name);
-  private conversations: Map<string, Conversation> = new Map();
   private anthropic: Anthropic;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly learningService: LearningService,
+    private readonly dataStore: DataStore,
   ) {
     this.anthropic = new Anthropic({
       apiKey: this.configService.get<string>('ANTHROPIC_API_KEY'),
     });
+  }
+
+  private getConv(id: string): Conversation | undefined {
+    return this.dataStore.get<Conversation>('conversations', id);
+  }
+
+  private saveConv(conv: Conversation): void {
+    this.dataStore.set('conversations', conv.id, conv);
   }
 
   async createConversation(
@@ -118,7 +127,7 @@ export class CoachingService {
       updatedAt: new Date(),
     };
 
-    this.conversations.set(conversationId, conversation);
+    this.saveConv(conversation);
 
     this.logger.log(
       `New conversation created: ${conversationId} for user ${userId} in ${mode} mode`,
@@ -132,7 +141,8 @@ export class CoachingService {
     page: number = 1,
     limit: number = 20,
   ) {
-    const userConversations = Array.from(this.conversations.values())
+    const allConvs = this.dataStore.getAll<Conversation>('conversations');
+    const userConversations = Array.from(allConvs.values())
       .filter((c) => c.userId === userId)
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
 
@@ -158,7 +168,7 @@ export class CoachingService {
   }
 
   async getConversation(userId: string, conversationId: string) {
-    const conversation = this.conversations.get(conversationId);
+    const conversation = this.getConv(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -174,7 +184,7 @@ export class CoachingService {
     conversationId: string,
     content: string,
   ) {
-    const conversation = this.conversations.get(conversationId);
+    const conversation = this.getConv(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -208,6 +218,7 @@ export class CoachingService {
     };
     conversation.messages.push(assistantMessage);
     conversation.updatedAt = new Date();
+    this.saveConv(conversation);
 
     // Update title if this is the first real exchange
     const userMessages = conversation.messages.filter(
@@ -244,7 +255,7 @@ export class CoachingService {
     conversationId: string,
     newMode: CoachingMode,
   ) {
-    const conversation = this.conversations.get(conversationId);
+    const conversation = this.getConv(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -255,6 +266,7 @@ export class CoachingService {
     const previousMode = conversation.mode;
     conversation.mode = newMode;
     conversation.updatedAt = new Date();
+    this.saveConv(conversation);
 
     // Insert a system message noting the mode change
     const modeChangeMessage: Message = {
@@ -283,7 +295,7 @@ export class CoachingService {
     conversationId: string,
     data: { messageId: string; score: number; note?: string },
   ) {
-    const conversation = this.conversations.get(conversationId);
+    const conversation = this.getConv(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
@@ -371,8 +383,8 @@ export class CoachingService {
 
     // Get or create conversation
     let conversation: Conversation;
-    if (data.conversationId && this.conversations.has(data.conversationId)) {
-      conversation = this.conversations.get(data.conversationId)!;
+    if (data.conversationId && this.getConv(data.conversationId)) {
+      conversation = this.getConv(data.conversationId)!;
       if (conversation.userId !== userId) {
         throw new ForbiddenException('Access denied');
       }
@@ -395,7 +407,7 @@ export class CoachingService {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      this.conversations.set(conversationId, conversation);
+      this.saveConv(conversation);
     }
 
     // Add user message
@@ -450,6 +462,7 @@ export class CoachingService {
         timestamp: new Date(),
       });
       conversation.updatedAt = new Date();
+    this.saveConv(conversation);
 
       // Store conversation embedding for future RAG retrieval (user-scoped)
       this.storeConversationForLearning(userId, conversation);

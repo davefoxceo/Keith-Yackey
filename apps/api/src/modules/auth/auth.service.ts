@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { DataStore } from '../learning/data-store.service';
 
 interface StoredUser {
   id: string;
@@ -20,8 +21,8 @@ interface StoredUser {
   relationshipStatus?: string;
   timezone?: string;
   refreshToken?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 @Injectable()
@@ -29,24 +30,34 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   private readonly SALT_ROUNDS = 12;
 
-  // In production, replace with database repository
-  private users: Map<string, StoredUser> = new Map();
-  private emailIndex: Map<string, string> = new Map();
-
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly dataStore: DataStore,
   ) {}
+
+  private get users(): Map<string, StoredUser> {
+    return this.dataStore.getAll<StoredUser>('users');
+  }
+
+  private getEmailIndex(): Map<string, string> {
+    // Build email index from users on the fly
+    const index = new Map<string, string>();
+    for (const [id, user] of this.users) {
+      index.set(user.email, id);
+    }
+    return index;
+  }
 
   async register(dto: RegisterDto) {
     // Check for existing user
-    if (this.emailIndex.has(dto.email.toLowerCase())) {
+    if (this.getEmailIndex().has(dto.email.toLowerCase())) {
       throw new ConflictException('An account with this email already exists');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, this.SALT_ROUNDS);
     const userId = uuidv4();
-    const now = new Date();
+    const now = new Date().toISOString();
 
     const user: StoredUser = {
       id: userId,
@@ -60,8 +71,7 @@ export class AuthService {
       updatedAt: now,
     };
 
-    this.users.set(userId, user);
-    this.emailIndex.set(user.email, userId);
+    this.dataStore.set('users', userId, user);
 
     this.logger.log(`New user registered: ${user.email} (${userId})`);
 
@@ -70,7 +80,7 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const email = dto.email.toLowerCase();
-    const userId = this.emailIndex.get(email);
+    const userId = this.getEmailIndex().get(email);
 
     if (!userId) {
       throw new UnauthorizedException('Invalid email or password');
@@ -157,9 +167,10 @@ export class AuthService {
       this.jwtService.signAsync(payload, { expiresIn: refreshExpiresIn }),
     ]);
 
-    // Store refresh token for rotation
+    // Store refresh token for rotation (persisted)
     user.refreshToken = refreshToken;
-    user.updatedAt = new Date();
+    user.updatedAt = new Date().toISOString();
+    this.dataStore.set('users', user.id, user);
 
     const expiresInSeconds = this.parseExpirationToSeconds(expiresIn);
 
