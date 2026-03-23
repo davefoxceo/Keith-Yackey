@@ -1,0 +1,54 @@
+version: '3.8'
+
+# Coach Keith AI — Local Development Infrastructure
+#
+# Start:  docker compose up -d
+# Stop:   docker compose down
+# Reset:  docker compose down -v  (deletes all data)
+#
+# Services:
+#   pgvector (5433)       - PostgreSQL + pgvector for Pi-Brain memory storage
+#   firestore (8681)      - Google Firestore emulator (future Cloud Run migration)
+#   gcs (4443)            - Fake GCS server (future Cloud Storage migration)
+
+services:
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: coach-keith-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: navigator
+      POSTGRES_PASSWORD: navigator
+      POSTGRES_DB: coach_keith_brain
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U navigator -d coach_keith_brain"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  firestore:
+    image: mtlynch/firestore-emulator:latest
+    container_name: coach-keith-firestore
+    ports:
+      - "8681:8681"
+    environment:
+      FIRESTORE_PROJECT_ID: coach-keith-local
+    platform: linux/amd64
+
+  gcs:
+    image: fsouza/fake-gcs-server:latest
+    container_name: coach-keith-gcs
+    ports:
+      - "4443:4443"
+    command: ["-scheme", "http", "-port", "4443", "-public-host", "localhost:4443"]
+    volumes:
+      - gcsdata:/data
+
+volumes:
+  pgdata:
+    driver: local
+  gcsdata:
+    driver: local
