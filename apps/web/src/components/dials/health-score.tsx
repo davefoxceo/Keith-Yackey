@@ -70,7 +70,7 @@ export function HealthScore({ score, previousScore, maxScore = 100 }: HealthScor
       </div>
 
       <div className="text-center">
-        <p className="text-sm font-semibold text-white">Marriage Health</p>
+        <p className="text-sm font-semibold text-white">Five Dials Health</p>
         <div className="flex items-center justify-center gap-1 mt-0.5">
           {trend === "up" && <TrendingUp className="w-3 h-3 text-emerald-400" />}
           {trend === "down" && <TrendingDown className="w-3 h-3 text-rose-400" />}

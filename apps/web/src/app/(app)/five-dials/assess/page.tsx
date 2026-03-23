@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Dumbbell,
-  Sparkles,
-  DollarSign,
+  Baby,
   Heart,
+  DollarSign,
   Gamepad2,
+  Zap,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
@@ -27,63 +27,63 @@ interface DialQuestion {
 
 const dialQuestions: DialQuestion[] = [
   {
-    dial: "Fitness",
-    icon: <Dumbbell className="w-8 h-8" />,
-    color: "#f59e0b",
+    dial: "Parent",
+    icon: <Baby className="w-8 h-8" />,
+    color: "#3b82f6",
     question:
-      "Brother, let's talk about your body. Are you training? Eating right? Do you have the energy to show up for your family like a warrior — or are you dragging through the day?",
+      "How are you showing up as a father? Are you actively leading, present with your kids, involved in their lives — or are you checked out, letting your wife handle it all while you scroll your phone?",
     anchors: {
-      low: "No exercise, low energy, poor diet",
-      mid: "Inconsistent workouts, decent energy",
-      high: "Consistent training, peak energy, dialed nutrition",
+      low: "Absent, uninvolved, leaving it all to her",
+      mid: "Present sometimes, could be more intentional",
+      high: "Active leader, deeply involved, kids look up to you",
     },
   },
   {
-    dial: "Faith",
-    icon: <Sparkles className="w-8 h-8" />,
-    color: "#8b5cf6",
+    dial: "Partner",
+    icon: <Heart className="w-8 h-8" />,
+    color: "#ec4899",
     question:
-      "How's your inner game? Are you grounded in purpose? Do you have a morning routine that sets you up, or are you just reacting to life? Rate your spiritual and mental foundation.",
+      "Are you her best friend and true teammate — or just a roommate? When's the last time she looked at you and you could FEEL the connection? Be brutally honest here, brother.",
     anchors: {
-      low: "Lost, no routine, disconnected from purpose",
-      mid: "Some practice, finding direction",
-      high: "Daily practice, clear purpose, deeply grounded",
+      low: "Roommates, disconnected, she's pulled away",
+      mid: "Okay but on autopilot, room for growth",
+      high: "Deep connection, true teammates, she feels seen",
     },
   },
   {
-    dial: "Finances",
+    dial: "Producer",
     icon: <DollarSign className="w-8 h-8" />,
     color: "#10b981",
     question:
-      "Let's talk money. Are you providing? Building? Or are finances a source of stress and arguments? Be honest with yourself here — no one's watching.",
+      "Are you providing? Building? Or are finances a source of stress and arguments? A woman wants to know her man is handling business. Be honest with yourself here — no one's watching.",
     anchors: {
-      low: "Financial stress, no savings, debt issues",
+      low: "Financial stress, not providing stability",
       mid: "Stable but not growing, some anxiety",
-      high: "Thriving, investing, financial peace",
+      high: "Thriving, building wealth, she feels secure",
     },
   },
   {
-    dial: "Family",
-    icon: <Heart className="w-8 h-8" />,
-    color: "#3b82f6",
-    question:
-      "This is the big one. How's your marriage? Your relationship with your kids? When's the last time your wife looked at you and you could feel the connection? Rate your family relationships honestly.",
-    anchors: {
-      low: "Disconnected, frequent conflict, feeling distant",
-      mid: "Okay but on autopilot, room for growth",
-      high: "Deep connection, intentional, thriving together",
-    },
-  },
-  {
-    dial: "Fun",
+    dial: "Player",
     icon: <Gamepad2 className="w-8 h-8" />,
-    color: "#ec4899",
+    color: "#f59e0b",
     question:
-      "When's the last time you actually had FUN? Not scrolled your phone — real fun. Adventure. Hobbies. Laughter. Don't skip this one, brother. Joy matters.",
+      "Are you FUN? Are you the guy she fell in love with — spontaneous, adventurous, making her laugh? Or have you become boring, predictable, the guy who just watches TV every night?",
     anchors: {
-      low: "No hobbies, no fun, all work and obligations",
+      low: "Boring, predictable, no fun, all obligations",
       mid: "Some fun but inconsistent, could be better",
-      high: "Regular adventures, hobbies, genuine joy",
+      high: "Spontaneous, playful, she lights up around you",
+    },
+  },
+  {
+    dial: "Power",
+    icon: <Zap className="w-8 h-8" />,
+    color: "#8b5cf6",
+    question:
+      "Do you do what you say you're going to do, when you say you're going to do it — without fail? This is the foundation of everything. If she can't trust your word, nothing else matters.",
+    anchors: {
+      low: "Break promises, inconsistent, she can't rely on you",
+      mid: "Usually follow through, slip sometimes",
+      high: "Man of your word, 100% follow-through, rock solid",
     },
   },
 ];

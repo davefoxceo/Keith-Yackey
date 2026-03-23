@@ -27,7 +27,7 @@ const mockConversations: Conversation[] = [
   },
   {
     id: "2",
-    title: "Fitness accountability",
+    title: "Player accountability",
     lastMessage: "Your consistency is paying off, brother",
     updatedAt: new Date(Date.now() - 86400000),
     mode: "accountability",
@@ -35,7 +35,7 @@ const mockConversations: Conversation[] = [
   {
     id: "3",
     title: "Five Dials deep dive",
-    lastMessage: "Let's focus on the Finances dial this week",
+    lastMessage: "Let's focus on the Producer dial this week",
     updatedAt: new Date(Date.now() - 172800000),
     mode: "framework",
   },

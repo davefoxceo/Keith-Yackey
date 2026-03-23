@@ -7,11 +7,11 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 
 export interface FiveDialsScores {
-  self: number;
-  marriage: number;
-  family: number;
-  faith: number;
-  finances: number;
+  parent: number;
+  partner: number;
+  producer: number;
+  player: number;
+  power: number;
 }
 
 export interface FiveDialsAssessment {
@@ -45,40 +45,40 @@ export class AssessmentService {
   private challenges: Map<string, MicroChallenge[]> = new Map();
 
   private readonly DIAL_QUESTIONS: Record<keyof FiveDialsScores, string[]> = {
-    self: [
-      'I take time daily for personal growth and self-reflection',
-      'I manage my stress and emotions in healthy ways',
-      'I am physically active and prioritize my health',
-      'I have clear personal goals and am making progress toward them',
-      'I handle conflict without losing my temper',
-    ],
-    marriage: [
-      'My spouse and I communicate openly and honestly',
-      'I prioritize quality time with my spouse weekly',
-      'I actively listen to my spouse without becoming defensive',
-      'We are aligned on major life decisions',
-      'I express appreciation and affection regularly',
-    ],
-    family: [
+    parent: [
       'I am present and engaged during family time',
       'I model the values I want my children to learn',
       'I make individual time for each of my children',
       'Our family has consistent routines and traditions',
       'I co-parent effectively with my spouse',
     ],
-    faith: [
-      'I have a consistent spiritual practice or devotional life',
-      'My faith guides my daily decisions and relationships',
-      'I am part of a spiritual community or accountability group',
-      'I practice forgiveness and grace in my relationships',
-      'I find meaning and purpose beyond material success',
+    partner: [
+      'My spouse and I communicate openly and honestly',
+      'I prioritize quality time with my spouse weekly',
+      'I actively listen to my spouse without becoming defensive',
+      'We are aligned on major life decisions',
+      'I express appreciation and affection regularly',
     ],
-    finances: [
-      'My spouse and I are aligned on financial goals',
+    producer: [
+      'I am contributing financially to my family in a meaningful way',
       'I have a budget and stick to it consistently',
       'I am actively paying down debt or building savings',
+      'I have clear professional goals and am making progress toward them',
       'Financial stress does not dominate our household',
-      'I am generous and give intentionally',
+    ],
+    player: [
+      'I make time for fun and spontaneous activities',
+      'I am physically active and prioritize my health',
+      'I have hobbies and friendships outside of work and family',
+      'I bring playful energy to my relationships',
+      'I do things just for enjoyment, not productivity',
+    ],
+    power: [
+      'I do what I say I am going to do, when I say I am going to do it',
+      'I manage my stress and emotions in healthy ways',
+      'I take time daily for personal growth and self-reflection',
+      'I handle conflict without losing my temper',
+      'I hold myself to a high standard of personal integrity',
     ],
   };
 
@@ -86,30 +86,30 @@ export class AssessmentService {
     keyof FiveDialsScores,
     Array<{ title: string; description: string; difficulty: MicroChallenge['difficulty'] }>
   > = {
-    self: [
-      { title: '5-Minute Morning Meditation', description: 'Start your day with 5 minutes of quiet reflection before checking your phone.', difficulty: 'easy' },
-      { title: 'Journal Your Triggers', description: 'Write down 3 moments today where you felt reactive and what triggered them.', difficulty: 'medium' },
-      { title: 'Cold Shower Challenge', description: 'End your shower with 60 seconds of cold water. Build mental toughness.', difficulty: 'hard' },
-    ],
-    marriage: [
-      { title: 'Send an Appreciation Text', description: 'Text your wife 3 specific things you appreciate about her today.', difficulty: 'easy' },
-      { title: '15-Minute Connection Talk', description: 'Have a 15-minute conversation with your spouse — no phones, no TV, no kids.', difficulty: 'medium' },
-      { title: 'Plan a Surprise Date', description: 'Plan and execute a surprise date for your spouse this week.', difficulty: 'hard' },
-    ],
-    family: [
+    parent: [
       { title: 'Family Dinner: No Devices', description: 'Have a family dinner with all devices put away. Ask each person about their day.', difficulty: 'easy' },
       { title: 'One-on-One with a Child', description: 'Spend 30 minutes of focused one-on-one time with one of your children.', difficulty: 'medium' },
       { title: 'Create a Family Tradition', description: 'Establish a new weekly or monthly family tradition and do it this week.', difficulty: 'hard' },
     ],
-    faith: [
-      { title: 'Gratitude List', description: 'Write down 10 things you are grateful for today.', difficulty: 'easy' },
-      { title: 'Serve Someone Anonymously', description: 'Do something kind for someone without expecting recognition.', difficulty: 'medium' },
-      { title: 'Forgiveness Letter', description: 'Write a letter of forgiveness to someone who has wronged you (you do not have to send it).', difficulty: 'hard' },
+    partner: [
+      { title: 'Send an Appreciation Text', description: 'Text your wife 3 specific things you appreciate about her today.', difficulty: 'easy' },
+      { title: '15-Minute Connection Talk', description: 'Have a 15-minute conversation with your spouse — no phones, no TV, no kids.', difficulty: 'medium' },
+      { title: 'Plan a Surprise Date', description: 'Plan and execute a surprise date for your spouse this week.', difficulty: 'hard' },
     ],
-    finances: [
+    producer: [
       { title: 'Track Every Dollar Today', description: 'Record every purchase you make today, no matter how small.', difficulty: 'easy' },
       { title: 'Financial Check-In', description: 'Have a 20-minute financial check-in with your spouse. Review budget and goals.', difficulty: 'medium' },
       { title: 'Cancel 3 Subscriptions', description: 'Review all subscriptions and cancel at least 3 you do not truly need.', difficulty: 'hard' },
+    ],
+    player: [
+      { title: 'Do Something Fun Today', description: 'Do one activity purely for enjoyment — no agenda, no productivity, just fun.', difficulty: 'easy' },
+      { title: '30-Minute Workout', description: 'Get 30 minutes of physical activity. Move your body and clear your mind.', difficulty: 'medium' },
+      { title: 'Plan an Adventure', description: 'Plan and do something spontaneous this week that gets you out of your routine.', difficulty: 'hard' },
+    ],
+    power: [
+      { title: '5-Minute Morning Meditation', description: 'Start your day with 5 minutes of quiet reflection before checking your phone.', difficulty: 'easy' },
+      { title: 'Journal Your Triggers', description: 'Write down 3 moments today where you felt reactive and what triggered them.', difficulty: 'medium' },
+      { title: 'Keep Every Promise Today', description: 'Track every commitment you make today — no matter how small — and follow through on all of them.', difficulty: 'hard' },
     ],
   };
 
@@ -137,11 +137,11 @@ export class AssessmentService {
 
     // Calculate scores per dial (average of responses)
     const scores: FiveDialsScores = {
-      self: 0,
-      marriage: 0,
-      family: 0,
-      faith: 0,
-      finances: 0,
+      parent: 0,
+      partner: 0,
+      producer: 0,
+      player: 0,
+      power: 0,
     };
 
     for (const dial of Object.keys(scores) as Array<keyof FiveDialsScores>) {
@@ -318,13 +318,13 @@ export class AssessmentService {
   }
 
   private computeHealthScore(scores: FiveDialsScores): number {
-    // Weighted health score: marriage is weighted higher as it's the primary focus
+    // Weighted health score: partner is weighted higher as it's the primary focus
     const weights = {
-      self: 0.15,
-      marriage: 0.35,
-      family: 0.20,
-      faith: 0.15,
-      finances: 0.15,
+      parent: 0.20,
+      partner: 0.30,
+      producer: 0.15,
+      player: 0.15,
+      power: 0.20,
     };
 
     let weightedSum = 0;
@@ -394,17 +394,17 @@ export class AssessmentService {
       );
     }
 
-    // Marriage-specific insight
-    if (scores.marriage < 6) {
+    // Partner-specific insight
+    if (scores.partner < 6) {
       insights.push(
-        'Your marriage dial is below 6 — consider switching to Coach mode for a focused conversation about communication patterns.',
+        'Your Partner dial is below 6 — consider switching to Coach mode for a focused conversation about communication patterns.',
       );
     }
 
-    // Self-care check
-    if (scores.self < scores.marriage) {
+    // Power check
+    if (scores.power < scores.partner) {
       insights.push(
-        'Remember: you cannot pour from an empty cup. Your Self dial is lower than your Marriage dial — invest in yourself to be a better partner.',
+        'Remember: you cannot pour from an empty cup. Your Power dial is lower than your Partner dial — invest in your personal integrity to be a better partner.',
       );
     }
 

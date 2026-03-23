@@ -25,16 +25,16 @@ class SubmitFiveDialsDto {
     description:
       'Assessment responses keyed by dial_questionIndex (e.g., self_0, marriage_2). Values 1-10.',
     example: {
-      self_0: 7,
-      self_1: 6,
-      self_2: 8,
-      self_3: 5,
-      self_4: 7,
-      marriage_0: 4,
-      marriage_1: 5,
-      marriage_2: 3,
-      marriage_3: 6,
-      marriage_4: 5,
+      parent_0: 7,
+      parent_1: 6,
+      parent_2: 8,
+      parent_3: 5,
+      parent_4: 7,
+      partner_0: 4,
+      partner_1: 5,
+      partner_2: 3,
+      partner_3: 6,
+      partner_4: 5,
     },
   })
   @IsObject()
@@ -52,7 +52,7 @@ export class AssessmentController {
   @ApiOperation({
     summary: 'Submit Five Dials assessment',
     description:
-      'Submit responses to the Five Dials assessment (Self, Marriage, Family, Faith, Finances). Each response is scored 1-10. Returns computed scores, health score, insights, and trends.',
+      'Submit responses to the Five Dials assessment (Parent, Partner, Producer, Player, Power). Each response is scored 1-10. Returns computed scores, health score, insights, and trends.',
   })
   @ApiResponse({ status: 201, description: 'Assessment submitted and scored' })
   @ApiResponse({ status: 400, description: 'Invalid response data' })
@@ -91,7 +91,7 @@ export class AssessmentController {
 
   @Get('health-score')
   @ApiOperation({
-    summary: 'Get Marriage Health Score',
+    summary: 'Get Five Dials Health Score',
     description:
       'Returns the weighted health score (0-100) with category (thriving/growing/struggling/crisis), trends, and recommendations.',
   })

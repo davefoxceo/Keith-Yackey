@@ -44,20 +44,20 @@ const mockPosts: Post[] = [
     comments: 23,
     pinned: true,
     tier: "coach",
-    tags: ["Challenge", "Family"],
+    tags: ["Challenge", "Partner"],
   },
   {
     id: 2,
     author: "Mike R.",
     anonymous: false,
     content:
-      "Just hit 30 days of consistent morning workouts. Fitness dial went from 4 to 7. My wife noticed the change before I even told her about this app. She said 'something's different about you.' Brothers, the framework WORKS. Don't give up.",
+      "Just hit 30 days of consistent morning workouts. Player dial went from 4 to 7. My wife noticed the change before I even told her about this app. She said 'something's different about you.' Brothers, the framework WORKS. Don't give up.",
     timestamp: "5 hours ago",
     upvotes: 32,
     comments: 12,
     pinned: false,
     tier: "premium",
-    tags: ["Win", "Fitness"],
+    tags: ["Win", "Player"],
   },
   {
     id: 3,
@@ -70,20 +70,20 @@ const mockPosts: Post[] = [
     comments: 34,
     pinned: false,
     tier: "core",
-    tags: ["Support", "Family"],
+    tags: ["Support", "Partner"],
   },
   {
     id: 4,
     author: "James T.",
     anonymous: false,
     content:
-      "Financial dial update: Finally had THE money talk with my wife using Keith's Financial Peace Framework. For the first time in our marriage, we're on the same page about a budget. No fighting. Just teamwork. This is what it feels like.",
+      "Producer dial update: Finally had THE money talk with my wife using Keith's Financial Peace Framework. For the first time in our marriage, we're on the same page about a budget. No fighting. Just teamwork. This is what it feels like.",
     timestamp: "1 day ago",
     upvotes: 28,
     comments: 8,
     pinned: false,
     tier: "premium",
-    tags: ["Win", "Finances"],
+    tags: ["Win", "Producer"],
   },
 ];
 

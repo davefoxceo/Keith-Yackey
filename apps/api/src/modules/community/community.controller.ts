@@ -54,7 +54,7 @@ class CreatePostDto {
 class RequestPartnerDto {
   @ApiProperty({
     required: false,
-    example: ['marriage', 'self'],
+    example: ['partner', 'power'],
     description: 'Dials you want to focus on with your partner',
   })
   @IsArray()

@@ -23,44 +23,44 @@ import { HealthScore } from "@/components/dials/health-score";
 
 const dials = [
   {
-    name: "Fitness",
+    name: "Parent",
     score: 7.5,
     previousScore: 6.8,
-    description: "Physical health, energy, discipline. Your body is the vehicle for everything else.",
-    icon: <Dumbbell className="w-5 h-5" style={{ color: "#f59e0b" }} />,
-    color: "#f59e0b",
-  },
-  {
-    name: "Faith",
-    score: 6.0,
-    previousScore: 5.5,
-    description: "Purpose, mindset, spiritual grounding. The foundation of who you are.",
-    icon: <Sparkles className="w-5 h-5" style={{ color: "#8b5cf6" }} />,
-    color: "#8b5cf6",
-  },
-  {
-    name: "Finances",
-    score: 5.5,
-    previousScore: 5.0,
-    description: "Financial security and abundance. Providing and building wealth.",
-    icon: <DollarSign className="w-5 h-5" style={{ color: "#10b981" }} />,
-    color: "#10b981",
-  },
-  {
-    name: "Family",
-    score: 8.0,
-    previousScore: 7.2,
-    description: "Marriage, kids, and deep connection. The relationships that matter most.",
+    description: "Are you actively leading as a father? Present, involved, and effective with your kids.",
     icon: <Heart className="w-5 h-5" style={{ color: "#3b82f6" }} />,
     color: "#3b82f6",
   },
   {
-    name: "Fun",
+    name: "Partner",
+    score: 6.0,
+    previousScore: 5.5,
+    description: "Are you her best friend and true teammate — or just a roommate?",
+    icon: <Sparkles className="w-5 h-5" style={{ color: "#ec4899" }} />,
+    color: "#ec4899",
+  },
+  {
+    name: "Producer",
+    score: 5.5,
+    previousScore: 5.0,
+    description: "Are you providing financial stability and contributing economically?",
+    icon: <DollarSign className="w-5 h-5" style={{ color: "#10b981" }} />,
+    color: "#10b981",
+  },
+  {
+    name: "Player",
+    score: 8.0,
+    previousScore: 7.2,
+    description: "Are you fun, playful, and spontaneous — or boring and predictable?",
+    icon: <Gamepad2 className="w-5 h-5" style={{ color: "#f59e0b" }} />,
+    color: "#f59e0b",
+  },
+  {
+    name: "Power",
     score: 4.5,
     previousScore: 4.0,
-    description: "Joy, adventure, and living fully. Don't forget to enjoy the ride.",
-    icon: <Gamepad2 className="w-5 h-5" style={{ color: "#ec4899" }} />,
-    color: "#ec4899",
+    description: "Do you do what you say, when you say it? Are you a man of your word?",
+    icon: <Zap className="w-5 h-5" style={{ color: "#8b5cf6" }} />,
+    color: "#8b5cf6",
   },
 ];
 
@@ -71,17 +71,17 @@ const radarData = dials.map((d) => ({
 }));
 
 const trendData = [
-  { date: "Week 1", fitness: 5, faith: 4, finances: 3, family: 6, fun: 3 },
-  { date: "Week 2", fitness: 5.5, faith: 4.5, finances: 3.5, family: 6.5, fun: 3 },
-  { date: "Week 3", fitness: 6, faith: 5, finances: 4, family: 7, fun: 3.5 },
-  { date: "Week 4", fitness: 6.8, faith: 5.5, finances: 5, family: 7.2, fun: 4 },
-  { date: "Week 5", fitness: 7.5, faith: 6, finances: 5.5, family: 8, fun: 4.5 },
+  { date: "Week 1", parent: 5, partner: 4, producer: 3, player: 6, power: 3 },
+  { date: "Week 2", parent: 5.5, partner: 4.5, producer: 3.5, player: 6.5, power: 3 },
+  { date: "Week 3", parent: 6, partner: 5, producer: 4, player: 7, power: 3.5 },
+  { date: "Week 4", parent: 6.8, partner: 5.5, producer: 5, player: 7.2, power: 4 },
+  { date: "Week 5", parent: 7.5, partner: 6, producer: 5.5, player: 8, power: 4.5 },
 ];
 
 const challenges = [
-  { name: "30 Pushups Daily", dial: "Fitness", progress: 71, daysLeft: 2 },
-  { name: "10-Min Meditation", dial: "Faith", progress: 43, daysLeft: 4 },
-  { name: "Budget Review", dial: "Finances", progress: 100, daysLeft: 0 },
+  { name: "Plan a surprise date", dial: "Player", progress: 71, daysLeft: 2 },
+  { name: "Take the kids out solo", dial: "Parent", progress: 43, daysLeft: 4 },
+  { name: "Keep every promise this week", dial: "Power", progress: 100, daysLeft: 0 },
 ];
 
 const container = {

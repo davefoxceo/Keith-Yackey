@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@coach-keith/shared": "workspace:*",
-    "@coach-keith/ruvector-client": "workspace:*"
+    "@coach-keith/shared": "*",
+    "@coach-keith/ruvector-client": "*"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@coach-keith/ai-engine": "workspace:*",
-    "@coach-keith/ruvector-client": "workspace:*",
-    "@coach-keith/shared": "workspace:*",
+    "@coach-keith/ai-engine": "*",
+    "@coach-keith/ruvector-client": "*",
+    "@coach-keith/shared": "*",
     "@nestjs/common": "^10.4.0",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^10.4.0",

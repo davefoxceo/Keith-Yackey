@@ -28,11 +28,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const dialData = [
-  { name: "Fitness", icon: Dumbbell, color: "#f59e0b", value: 8, desc: "Physical health, energy, and discipline" },
-  { name: "Faith", icon: Sparkles, color: "#8b5cf6", value: 7, desc: "Purpose, mindset, and spiritual grounding" },
-  { name: "Finances", icon: DollarSign, color: "#10b981", value: 6, desc: "Financial security and abundance" },
-  { name: "Family", icon: Heart, color: "#3b82f6", value: 9, desc: "Marriage, kids, and deep connection" },
-  { name: "Fun", icon: Gamepad2, color: "#ec4899", value: 7, desc: "Joy, adventure, and living fully" },
+  { name: "Parent", icon: Heart, color: "#3b82f6", value: 8, desc: "Active, present fatherhood and family leadership" },
+  { name: "Partner", icon: Users, color: "#ec4899", value: 7, desc: "Her best friend and true teammate — not a roommate" },
+  { name: "Producer", icon: DollarSign, color: "#10b981", value: 6, desc: "Financial provision and professional contribution" },
+  { name: "Player", icon: Gamepad2, color: "#f59e0b", value: 9, desc: "Fun, playful, spontaneous — never boring" },
+  { name: "Power", icon: Crown, color: "#8b5cf6", value: 7, desc: "Do what you say, when you say it — personal integrity" },
 ];
 
 const testimonials = [
@@ -90,7 +90,7 @@ const pricingTiers = [
       "Brotherhood community",
       "Accountability partner matching",
       "Micro-challenges system",
-      "Marriage Health Score",
+      "Five Dials Health Score",
       "Priority support",
     ],
     cta: "Start Free Trial",

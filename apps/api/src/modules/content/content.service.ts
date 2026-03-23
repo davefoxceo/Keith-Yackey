@@ -54,12 +54,12 @@ export class ContentService {
       thumbnailUrl: '/images/ep-001.jpg',
       publishedAt: new Date('2024-01-15'),
       tags: ['five-dials', 'framework', 'introduction', 'foundation'],
-      relatedDials: ['self', 'marriage', 'family', 'faith', 'finances'],
+      relatedDials: ['parent', 'partner', 'producer', 'player', 'power'],
       transcript: 'Full transcript of Episode 1...',
       keyTimestamps: [
         { time: 60, label: 'What are the Five Dials?' },
         { time: 300, label: 'Why most men focus on the wrong dial first' },
-        { time: 720, label: 'The Self dial — where everything starts' },
+        { time: 720, label: 'The Power dial — where everything starts' },
         { time: 1200, label: 'How the dials interact' },
         { time: 1800, label: 'Your first assessment' },
       ],
@@ -74,8 +74,8 @@ export class ContentService {
       audioUrl: '/audio/ep-002.mp3',
       thumbnailUrl: '/images/ep-002.jpg',
       publishedAt: new Date('2024-01-22'),
-      tags: ['marriage', 'communication', 'patterns', 'obligation'],
-      relatedDials: ['marriage', 'self'],
+      tags: ['partner', 'communication', 'patterns', 'obligation'],
+      relatedDials: ['partner', 'power'],
     },
     {
       id: 'ep-003',
@@ -88,7 +88,7 @@ export class ContentService {
       thumbnailUrl: '/images/ep-003.jpg',
       publishedAt: new Date('2024-01-29'),
       tags: ['accountability', 'habits', 'systems', 'willpower'],
-      relatedDials: ['self'],
+      relatedDials: ['power'],
     },
     {
       id: 'ep-004',
@@ -100,8 +100,8 @@ export class ContentService {
       audioUrl: '/audio/ep-004.mp3',
       thumbnailUrl: '/images/ep-004.jpg',
       publishedAt: new Date('2024-02-05'),
-      tags: ['finances', 'conflict', 'communication', 'money'],
-      relatedDials: ['finances', 'marriage'],
+      tags: ['producer', 'conflict', 'communication', 'money'],
+      relatedDials: ['producer', 'partner'],
     },
     {
       id: 'ep-005',
@@ -113,8 +113,8 @@ export class ContentService {
       audioUrl: '/audio/ep-005.mp3',
       thumbnailUrl: '/images/ep-005.jpg',
       publishedAt: new Date('2024-02-12'),
-      tags: ['family', 'fatherhood', 'legacy', 'intentional'],
-      relatedDials: ['family', 'self'],
+      tags: ['parent', 'fatherhood', 'legacy', 'intentional'],
+      relatedDials: ['parent', 'power'],
     },
   ];
 
@@ -129,20 +129,20 @@ export class ContentService {
         'The man you are today is the sum of your daily choices',
         'It is never too late to start doing the work',
       ],
-      relatedDials: ['self'],
+      relatedDials: ['power'],
       exercises: ['Write your "rock bottom" moment', 'List 3 things you are tolerating that you should not be'],
     },
     {
       id: 'ch-02',
       number: 2,
       title: 'The Five Dials',
-      summary: 'An in-depth exploration of each dial — Self, Marriage, Family, Faith, and Finances — and how they interconnect.',
+      summary: 'An in-depth exploration of each dial — Parent, Partner, Producer, Player, and Power — and how they interconnect.',
       keyTakeaways: [
         'All five dials must be addressed for sustainable growth',
-        'Self is always Dial One — you cannot give what you do not have',
+        'Power is the foundation dial — you cannot give what you do not have',
         'Imbalance in one dial will eventually affect all the others',
       ],
-      relatedDials: ['self', 'marriage', 'family', 'faith', 'finances'],
+      relatedDials: ['parent', 'partner', 'producer', 'player', 'power'],
       exercises: ['Complete your first Five Dials assessment', 'Identify your highest and lowest dials'],
     },
     {
@@ -155,7 +155,7 @@ export class ContentService {
         'Defensiveness is the death of intimacy',
         'Ask questions before making statements',
       ],
-      relatedDials: ['marriage', 'self'],
+      relatedDials: ['partner', 'power'],
       exercises: ['Practice the HEAR framework in one conversation today', 'Ask your wife: "What do you need from me that you are not getting?"'],
     },
   ];
@@ -165,7 +165,7 @@ export class ContentService {
       id: 'fw-five-dials',
       name: 'The Five Dials',
       slug: 'five-dials',
-      description: 'The core framework for assessing and improving five key areas of a man\'s life: Self, Marriage, Family, Faith, and Finances.',
+      description: 'The core framework for assessing and improving five key areas of a man\'s life: Parent, Partner, Producer, Player, and Power.',
       category: 'Core Framework',
       steps: [
         { order: 1, title: 'Assess', description: 'Rate each dial honestly from 1-10. No sugarcoating.' },
@@ -174,7 +174,7 @@ export class ContentService {
         { order: 4, title: 'Track', description: 'Monitor your progress daily and reassess weekly.' },
         { order: 5, title: 'Iterate', description: 'As one dial rises, shift focus to the next lowest.' },
       ],
-      relatedDials: ['self', 'marriage', 'family', 'faith', 'finances'],
+      relatedDials: ['parent', 'partner', 'producer', 'player', 'power'],
       relatedEpisodes: ['ep-001'],
     },
     {
@@ -189,7 +189,7 @@ export class ContentService {
         { order: 3, title: 'Acknowledge', description: 'Repeat back what you heard. "What I am hearing is..."' },
         { order: 4, title: 'Respond', description: 'Now — and only now — share your perspective. Start with "I" statements.' },
       ],
-      relatedDials: ['marriage'],
+      relatedDials: ['partner'],
       relatedEpisodes: ['ep-002'],
     },
     {
@@ -203,7 +203,7 @@ export class ContentService {
         { order: 2, title: 'Midday Check-In (2 min)', description: 'Am I living my intention? Have I been reactive or intentional? Quick recalibration.' },
         { order: 3, title: 'Evening Reflection (5 min)', description: 'What went well? Where did I fall short? What am I grateful for? What will I do differently tomorrow?' },
       ],
-      relatedDials: ['self'],
+      relatedDials: ['power'],
       relatedEpisodes: ['ep-003'],
     },
   ];

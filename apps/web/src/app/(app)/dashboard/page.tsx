@@ -23,11 +23,11 @@ import { MilestoneBadge } from "@/components/engagement/milestone-badge";
 import { DailyPrompt } from "@/components/engagement/daily-prompt";
 
 const radarData = [
-  { dial: "Fitness", score: 7.5, fullMark: 10 as const },
-  { dial: "Faith", score: 6.0, fullMark: 10 as const },
-  { dial: "Finances", score: 5.5, fullMark: 10 as const },
-  { dial: "Family", score: 8.0, fullMark: 10 as const },
-  { dial: "Fun", score: 4.5, fullMark: 10 as const },
+  { dial: "Parent", score: 7.5, fullMark: 10 as const },
+  { dial: "Partner", score: 6.0, fullMark: 10 as const },
+  { dial: "Producer", score: 5.5, fullMark: 10 as const },
+  { dial: "Player", score: 8.0, fullMark: 10 as const },
+  { dial: "Power", score: 4.5, fullMark: 10 as const },
 ];
 
 const milestones = [
@@ -152,7 +152,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-slate-300 mb-2">
-                Fitness Dial: 30 pushups every morning for 7 days
+                Player Dial: 30 pushups every morning for 7 days
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
