@@ -118,6 +118,10 @@ export class CoachingController {
     @Body() dto: StreamChatDto,
     @Res() res: Response,
   ) {
+    // CORS headers must be set manually when using @Res() as it bypasses NestJS middleware
+    const origin = (res.req?.headers?.origin as string) || 'http://localhost:3002';
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');

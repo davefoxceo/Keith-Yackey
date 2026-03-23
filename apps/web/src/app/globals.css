@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/* PWA: iPhone safe areas and standalone mode */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Prevent pull-to-refresh in standalone PWA */
+@media (display-mode: standalone) {
+  html {
+    overscroll-behavior: none;
+  }
+}
+
+/* Smooth touch scrolling */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
 @theme {
   --color-brand-navy: #0f172a;
   --color-brand-charcoal: #1e293b;
