@@ -5,6 +5,10 @@ const STATIC_ASSETS = [
   '/coach',
   '/five-dials',
   '/content',
+  '/brotherhood',
+  '/settings',
+  '/login',
+  '/register',
   '/manifest.json',
 ];
 
