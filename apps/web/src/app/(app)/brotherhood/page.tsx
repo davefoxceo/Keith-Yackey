@@ -115,11 +115,21 @@ export default function BrotherhoodPage() {
   };
 
   return (
+    <div className="relative">
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/images/generated/brotherhood.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          opacity: 0.1,
+        }}
+      />
     <motion.div
       variants={container}
       initial="hidden"
       animate="show"
-      className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6"
+      className="relative p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6"
     >
       {/* Header */}
       <motion.div variants={item}>
@@ -363,5 +373,6 @@ export default function BrotherhoodPage() {
         </motion.div>
       </div>
     </motion.div>
+    </div>
   );
 }

@@ -99,11 +99,22 @@ const item = {
 
 export default function FiveDialsPage() {
   return (
+    <div className="relative">
+      {/* Background visual */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/images/generated/five-dials-visual.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.08,
+        }}
+      />
     <motion.div
       variants={container}
       initial="hidden"
       animate="show"
-      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6"
+      className="relative p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6"
     >
       {/* Header */}
       <motion.div variants={item} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -229,5 +240,6 @@ export default function FiveDialsPage() {
         </motion.div>
       </div>
     </motion.div>
+    </div>
   );
 }

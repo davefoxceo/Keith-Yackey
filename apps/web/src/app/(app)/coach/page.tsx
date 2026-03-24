@@ -66,15 +66,17 @@ export default function CoachPage() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden relative">
-      {/* Subtle coaching atmosphere background */}
+      {/* Coaching atmosphere background */}
       <div
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: 'url(/images/generated/coaching-session.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          opacity: 0.12,
         }}
       />
+      <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/80 to-brand-navy pointer-events-none" />
       {/* Conversation Sidebar */}
       <AnimatePresence>
         {showSidebar && (

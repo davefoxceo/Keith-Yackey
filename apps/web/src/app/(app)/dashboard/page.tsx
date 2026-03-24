@@ -56,11 +56,21 @@ const item = {
 
 export default function DashboardPage() {
   return (
+    <div className="relative">
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/images/generated/dashboard-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.06,
+        }}
+      />
     <motion.div
       variants={container}
       initial="hidden"
       animate="show"
-      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6"
+      className="relative p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6"
     >
       {/* Welcome + Streak Row */}
       <motion.div variants={item} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -253,5 +263,6 @@ export default function DashboardPage() {
         </motion.div>
       </div>
     </motion.div>
+    </div>
   );
 }

@@ -179,12 +179,11 @@ export default function LandingPage() {
             src="/images/generated/hero-couple.png"
             alt=""
             fill
-            className="object-cover opacity-20"
+            className="object-cover opacity-40"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy via-brand-navy/90 to-brand-navy" />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/80 to-brand-navy" />
         </div>
-        <div className="bg-hero-glow absolute inset-0" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
@@ -368,9 +367,9 @@ export default function LandingPage() {
             src="/images/generated/transformation.png"
             alt=""
             fill
-            className="object-cover opacity-10"
+            className="object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/95 to-brand-navy/80" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/85 to-brand-navy/70" />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
