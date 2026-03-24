@@ -30,21 +30,30 @@ export function FiveDialsRadarChart({
   interactive = false,
   onDialClick,
 }: RadarChartProps) {
-  const heights = { sm: 280, md: 420, lg: 500 };
+  const heights = { sm: 200, md: 300, lg: 400 };
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const CustomLabel = (props: any) => {
-    const { x, y, payload } = props;
+    const { x, y, cx, cy, payload } = props;
     const label = payload?.value || '';
     const score = scores.find((s) => s.dial === label)?.score;
+
+    // Push labels outward from center by adding offset along the center→label vector
+    const dx = x - (cx || 0);
+    const dy = y - (cy || 0);
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const push = 22; // pixels to push labels away from web
+    const lx = x + (dx / dist) * push;
+    const ly = y + (dy / dist) * push;
+
     return (
       <g
         onClick={() => interactive && onDialClick?.(label)}
         style={{ cursor: interactive ? 'pointer' : 'default' }}
       >
         <text
-          x={x}
-          y={y - 9}
+          x={lx}
+          y={ly - 8}
           textAnchor="middle"
           dominantBaseline="central"
           style={{ fill: '#e2e8f0', fontSize: 14, fontWeight: 600 }}
@@ -52,8 +61,8 @@ export function FiveDialsRadarChart({
           {label}
         </text>
         <text
-          x={x}
-          y={y + 11}
+          x={lx}
+          y={ly + 10}
           textAnchor="middle"
           dominantBaseline="central"
           style={{ fill: '#f59e0b', fontSize: 13, fontWeight: 700 }}
@@ -66,7 +75,7 @@ export function FiveDialsRadarChart({
 
   return (
     <ResponsiveContainer width="100%" height={heights[size]}>
-      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="60%">
+      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="80%">
         <PolarGrid
           stroke="#334155"
           strokeDasharray="3 3"
