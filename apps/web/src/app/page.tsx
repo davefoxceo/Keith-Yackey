@@ -174,8 +174,17 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/generated/hero-couple.png"
+            alt=""
+            fill
+            className="object-cover opacity-20"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy via-brand-navy/90 to-brand-navy" />
+        </div>
         <div className="bg-hero-glow absolute inset-0" />
-        <div className="bg-grid-pattern absolute inset-0 opacity-30" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
@@ -353,8 +362,16 @@ export default function LandingPage() {
       </section>
 
       {/* Keith's Story */}
-      <section id="story" className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-500/[0.03] to-transparent" />
+      <section id="story" className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/generated/transformation.png"
+            alt=""
+            fill
+            className="object-cover opacity-10"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/95 to-brand-navy/80" />
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
