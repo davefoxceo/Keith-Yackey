@@ -65,13 +65,14 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 <div class="card">
 <h3 style="margin-top:0">Total Addressable Market</h3>
 <table>
-<tr><td>US married men</td><td style="color:#fff;font-weight:600">~62M</td></tr>
-<tr><td>Earning $250K+/year</td><td style="color:#fff;font-weight:600">~3.1M (5%)</td></tr>
-<tr><td>Experiencing marriage issues</td><td style="color:#fff;font-weight:600">~1.2M (40%)</td></tr>
-<tr><td>Willing to seek help</td><td style="color:#fff;font-weight:600">~360K (30%)</td></tr>
-<tr><td>Open to digital/AI coaching</td><td style="color:#f59e0b;font-weight:700">~108K (30%)</td></tr>
+<tr><td>US married adults</td><td style="color:#fff;font-weight:600">~133M <sup>[1]</sup></td></tr>
+<tr><td>Married men (est. half)</td><td style="color:#fff;font-weight:600">~66.5M</td></tr>
+<tr><td>HH income $250K+ (10.1%)</td><td style="color:#fff;font-weight:600">~6.7M <sup>[2]</sup></td></tr>
+<tr><td>Maritally distressed (~20%)</td><td style="color:#fff;font-weight:600">~1.34M <sup>[3]</sup></td></tr>
+<tr><td>Men who seek help (17%)</td><td style="color:#fff;font-weight:600">~228K <sup>[4]</sup></td></tr>
+<tr><td>Open to digital (38%)</td><td style="color:#f59e0b;font-weight:700">~86K <sup>[5]</sup></td></tr>
 </table>
-<p style="font-size:.75rem;color:#64748b;margin-top:.5rem">SAM: ~108K high-income men reachable via digital coaching</p>
+<p style="font-size:.7rem;color:#64748b;margin-top:.5rem">SAM: ~86K high-income married men reachable via digital coaching</p>
 </div>
 <div class="card">
 <h3 style="margin-top:0">Keith's Current Reach</h3>
@@ -125,10 +126,10 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 
 <!-- Key Metrics -->
 <div class="grid grid-4">
-<div class="card" style="border-color:#f59e0b44;position:relative"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#f59e0b,#d97706)"></div><div class="metric"><div class="metric-value" id="m-rev">—</div><div class="metric-label">Year 2 ARR (Median)</div></div></div>
-<div class="card"><div class="metric"><div class="metric-value" style="color:#10b981" id="m-users">—</div><div class="metric-label">Subscribers (M24)</div></div></div>
-<div class="card"><div class="metric"><div class="metric-value" style="color:#3b82f6" id="m-ltv">—</div><div class="metric-label">Customer LTV</div></div></div>
-<div class="card"><div class="metric"><div class="metric-value" style="color:#8b5cf6" id="m-roi">—</div><div class="metric-label">LTV / CAC</div></div></div>
+<div class="card" style="border-color:#f59e0b44;position:relative"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#f59e0b,#d97706)"></div><div class="metric"><div class="metric-value" id="m-rev">—</div><div class="metric-label">Year 2 Revenue Run Rate</div><div class="metric-sub">MRR x 12 (gross, before costs)</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="color:#10b981" id="m-users">—</div><div class="metric-label">Active Subscribers (M24)</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="color:#3b82f6" id="m-ltv">—</div><div class="metric-label">Customer LTV</div><div class="metric-sub">ARPU / monthly churn</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="color:#8b5cf6" id="m-roi">—</div><div class="metric-label">LTV / CAC Ratio</div><div class="metric-sub">Above 3:1 = sustainable</div></div></div>
 </div>
 
 <div class="card" style="margin:1.25rem 0">
@@ -164,12 +165,13 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 </div>
 
 <!-- 24mo P&L -->
-<h2>Cumulative 24-Month Economics (Median)</h2>
+<h2>Cumulative 24-Month P&amp;L (Median Scenario)</h2>
+<div class="note">Revenue = subscription income. Costs = customer acquisition + estimated operations (~$5/user/mo for API, hosting, support). Net = Revenue minus all costs. CAC does NOT affect revenue — it only affects costs and net profit.</div>
 <div class="grid grid-4">
-<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem" id="cum-rev">—</div><div class="metric-label">Total Revenue</div></div></div>
-<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem;color:#f43f5e" id="cum-cac">—</div><div class="metric-label">Total CAC Spend</div></div></div>
-<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem;color:#10b981" id="cum-profit">—</div><div class="metric-label">Gross Margin</div></div></div>
-<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem;color:#8b5cf6" id="cum-payback">—</div><div class="metric-label">CAC Payback</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem" id="cum-rev">—</div><div class="metric-label">24-Mo Gross Revenue</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem;color:#f43f5e" id="cum-cac">—</div><div class="metric-label">24-Mo Total Costs</div><div class="metric-sub">CAC + operations</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem;color:#10b981" id="cum-profit">—</div><div class="metric-label">24-Mo Net Profit</div><div class="metric-sub">Revenue minus all costs</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="font-size:1.5rem;color:#8b5cf6" id="cum-payback">—</div><div class="metric-label">CAC Payback Period</div><div class="metric-sub">Months to recover CAC</div></div></div>
 </div>
 
 <h2>Model Assumptions</h2>
@@ -185,9 +187,22 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 </table>
 </div>
 
+<h2>Sources &amp; Footnotes</h2>
+<div class="card" style="font-size:.8rem;color:#94a3b8">
+<p><strong style="color:#fff">[1] US married adults: ~133.1M</strong> — US Census Bureau, Current Population Survey 2023 ASEC Supplement. 133.1 million married adults age 15+, not counting 4.6M separated. <a href="https://www.census.gov/topics/families/marriage-and-divorce.html" style="color:#f59e0b" target="_blank">census.gov/marriage-and-divorce</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[2] Households earning $250K+: 10.1%</strong> — As of 2025, 10.1% of US households (13.7M) earn $250K+. Source: DQYDJ analysis of Census CPS data. <a href="https://dqydj.com/household-income-percentile-calculator/" style="color:#f59e0b" target="_blank">dqydj.com/household-income-percentile-calculator</a>. Also supported by: <a href="https://www2.census.gov/library/publications/2025/demo/p60-286.pdf" style="color:#f59e0b" target="_blank">Census Bureau P60-286 (2024 income data)</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[3] Marital distress: ~20%</strong> — "Approximately 20% of all married couples experience marital distress at any given time." ABCT (Association for Behavioral and Cognitive Therapies) fact sheet. <a href="https://www.abct.org/fact-sheets/marital-distress/" style="color:#f59e0b" target="_blank">abct.org/fact-sheets/marital-distress</a>. Also: "Up to a third of married individuals report low marital satisfaction" — PMC/Frontiers in Psychology, 2025. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11961942/" style="color:#f59e0b" target="_blank">PMC11961942</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[4] Men seeking help: 17%</strong> — "In 2024, around 17% of men received mental health treatment or counseling." Statista, based on SAMHSA NSDUH data. <a href="https://www.statista.com/statistics/673172/mental-health-treatment-counseling-past-year-us-men/" style="color:#f59e0b" target="_blank">statista.com/673172</a>. Note: Only 7.9% of men specifically attended counseling/therapy sessions (vs 21.2% of women). <a href="https://gatewaycounseling.com/men-seeking-counseling-statistics/" style="color:#f59e0b" target="_blank">gatewaycounseling.com</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[5] Digital/telehealth adoption: 38%</strong> — "Nearly 38% of Americans have utilized telehealth services for medical or mental health needs." Source: APA/telehealth industry surveys 2024. <a href="https://agentsofchangeprep.com/blog/telehealth-in-2025-and-beyond-key-trends-shaping-online-therapy/" style="color:#f59e0b" target="_blank">agentsofchangeprep.com</a>. Mental health-specific: "62.3% of telehealth claims had a mental health diagnosis" (Feb 2025). <a href="https://crowncounseling.com/statistics/teletherapy-stats/" style="color:#f59e0b" target="_blank">crowncounseling.com</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[6] Subscription app churn: ~86% churn in year 1</strong> — "Only 13.8% of monthly subscribers are still active after a year." RevenueCat State of Subscription Apps 2024, analyzing 30,000+ apps. <a href="https://www.revenuecat.com/state-of-subscription-apps-2024/" style="color:#f59e0b" target="_blank">revenuecat.com/state-of-subscription-apps-2024</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[7] Customer acquisition cost: $22-175+</strong> — Average Facebook CPL across industries: $21.98 (2024). Coaching/high-ticket services typically 3-8x higher due to audience targeting. <a href="https://www.flyweel.co/blog/lead-gen-cpl-cac-benchmark-index-2025" style="color:#f59e0b" target="_blank">flyweel.co/lead-gen-cpl-cac-benchmark</a>. Also: <a href="https://focus-digital.co/facebook-customer-acquisition-cost-by-industry-price-point/" style="color:#f59e0b" target="_blank">focus-digital.co/facebook-cac-by-industry</a></p>
+<p style="margin-top:.5rem"><strong style="color:#fff">[8] Market growth: 11.83% CAGR</strong> — Telehealth sector growth rate as of 2024. Online therapy services market projected to reach $17.34B by 2035. <a href="https://www.globenewswire.com/news-release/2026/03/06/3250923/0/en/" style="color:#f59e0b" target="_blank">GlobeNewsWire/SNS Insider</a></p>
+</div>
+
 <footer>
 <p>Coach Keith AI — Business Model Simulation | March 2026</p>
-<p>Monte Carlo method: 10,000 independent runs with randomized monthly growth, churn, ARPU, and seasonal inputs. Not a forecast — a probability distribution of outcomes.</p>
+<p>Monte Carlo method: 10,000 independent runs with randomized monthly growth, churn, ARPU, and seasonal inputs.</p>
+<p>This is a probability distribution of outcomes, not a forecast. All numbers are gross revenue unless labeled as net profit.</p>
 </footer>
 </div>
 
@@ -320,14 +335,28 @@ function runSimulation() {
     document.getElementById('m-ltv').textContent = fmt(ltv);
     document.getElementById('m-roi').textContent = (ltv / cac).toFixed(1) + 'x';
 
-    // Cumulative economics
+    // Cumulative economics (median path)
     const medCumRev = pct(cumRevenue, 0.5);
-    const totalNewUsers = allUsers[Math.floor(N * 0.5)].reduce((s, u, i) => i === 0 ? s : s + Math.max(0, u - allUsers[Math.floor(N * 0.5)][i-1] + Math.round(allUsers[Math.floor(N * 0.5)][i-1] * baseChurn)), 0);
-    const totalCacSpend = totalNewUsers * cac;
+    // Estimate total new users acquired over 24 months
+    const medPath = allUsers[Math.floor(N * 0.5)];
+    let totalAcquired = medPath[0]; // seed users (no CAC for existing clients)
+    for (let m = 1; m <= MONTHS; m++) {
+      const netGain = medPath[m] - medPath[m-1];
+      const churned = Math.round(medPath[m-1] * baseChurn);
+      totalAcquired += Math.max(0, netGain + churned); // new = net + replaced churned
+    }
+    const totalCacSpend = (totalAcquired - seedUsers) * cac; // don't charge CAC on seed users
+    const opsPerUserMonth = 5; // API + hosting + support
+    const totalOpsCost = medPath.reduce((s, u) => s + u * opsPerUserMonth, 0);
+    const totalCosts = totalCacSpend + totalOpsCost;
+    const netProfit = medCumRev - totalCosts;
+    const paybackMonths = cac / baseArpu;
+
     document.getElementById('cum-rev').textContent = fmt(medCumRev);
-    document.getElementById('cum-cac').textContent = fmt(totalCacSpend);
-    document.getElementById('cum-profit').textContent = fmt(medCumRev - totalCacSpend);
-    document.getElementById('cum-payback').textContent = (baseArpu / baseChurn / cac * 100).toFixed(0) + '% ROI';
+    document.getElementById('cum-cac').textContent = fmt(totalCosts);
+    document.getElementById('cum-profit').textContent = fmt(netProfit);
+    document.getElementById('cum-profit').style.color = netProfit >= 0 ? '#10b981' : '#f43f5e';
+    document.getElementById('cum-payback').textContent = paybackMonths.toFixed(1) + ' months';
 
     // Scenario table
     [0.1, 0.25, 0.5, 0.75, 0.9].forEach((p, i) => {
