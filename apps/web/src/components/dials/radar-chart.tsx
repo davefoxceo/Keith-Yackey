@@ -32,25 +32,31 @@ export function FiveDialsRadarChart({
 }: RadarChartProps) {
   const heights = { sm: 200, md: 300, lg: 400 };
 
-  const CustomLabel = ({ x, y, value }: { x: number; y: number; value: string }) => {
-    const score = scores.find((s) => s.dial === value)?.score;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const CustomLabel = (props: any) => {
+    const { x, y, payload } = props;
+    const label = payload?.value || '';
+    const score = scores.find((s) => s.dial === label)?.score;
     return (
-      <g onClick={() => interactive && onDialClick?.(value)} className="cursor-pointer">
+      <g
+        onClick={() => interactive && onDialClick?.(label)}
+        style={{ cursor: interactive ? 'pointer' : 'default' }}
+      >
         <text
           x={x}
-          y={y - 8}
+          y={y - 10}
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-slate-200 text-xs font-semibold"
+          style={{ fill: '#e2e8f0', fontSize: 13, fontWeight: 600 }}
         >
-          {value}
+          {label}
         </text>
         <text
           x={x}
-          y={y + 8}
+          y={y + 10}
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-amber-400 text-[11px] font-bold"
+          style={{ fill: '#f59e0b', fontSize: 12, fontWeight: 700 }}
         >
           {score != null ? `${score}/10` : ''}
         </text>
@@ -60,7 +66,7 @@ export function FiveDialsRadarChart({
 
   return (
     <ResponsiveContainer width="100%" height={heights[size]}>
-      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="75%">
+      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="65%">
         <PolarGrid
           stroke="#334155"
           strokeDasharray="3 3"
@@ -69,6 +75,7 @@ export function FiveDialsRadarChart({
         <PolarAngleAxis
           dataKey="dial"
           tick={CustomLabel}
+          tickLine={false}
         />
         <PolarRadiusAxis
           angle={90}
