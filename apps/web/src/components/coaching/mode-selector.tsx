@@ -9,31 +9,31 @@ import type { ConversationMode } from "@/hooks/use-chat";
 const modes = [
   {
     id: "free" as ConversationMode,
-    label: "Free Chat",
+    label: "Coach",
     icon: MessageCircle,
-    description: "Open conversation",
+    description: "Keith asks questions to help you find your own answers",
     color: "#f59e0b",
   },
   {
-    id: "crisis" as ConversationMode,
-    label: "Crisis",
-    icon: AlertTriangle,
-    description: "Urgent support",
-    color: "#ef4444",
-  },
-  {
     id: "framework" as ConversationMode,
-    label: "Framework",
+    label: "Mentor",
     icon: BookOpen,
-    description: "Learn concepts",
+    description: "Keith shares frameworks, tools, and direct advice",
     color: "#3b82f6",
   },
   {
     id: "accountability" as ConversationMode,
     label: "Accountability",
     icon: Target,
-    description: "Check progress",
+    description: "Keith checks your commitments and calls out excuses",
     color: "#10b981",
+  },
+  {
+    id: "crisis" as ConversationMode,
+    label: "Crisis",
+    icon: AlertTriangle,
+    description: "For urgent situations — compassionate, grounding support",
+    color: "#ef4444",
   },
 ];
 
@@ -51,6 +51,7 @@ export function ModeSelector({ currentMode, onModeChange }: ModeSelectorProps) {
           <button
             key={mode.id}
             onClick={() => onModeChange(mode.id)}
+            title={mode.description}
             className={cn(
               "relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
               isActive
