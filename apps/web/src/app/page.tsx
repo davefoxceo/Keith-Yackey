@@ -246,7 +246,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-3 p-2 pr-5 rounded-full border border-slate-800 bg-surface-raised/60">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-500/40">
                   <Image
-                    src="/images/keith/keith-orderofman.png"
+                    src="/images/keith/keith-dadedge-recent.jpg"
                     alt="Keith Yackey"
                     width={40}
                     height={40}
@@ -419,10 +419,10 @@ export default function LandingPage() {
               {/* Main Keith photo */}
               <div className="aspect-[4/5] rounded-3xl border border-slate-800 overflow-hidden relative">
                 <Image
-                  src="/images/keith/keith-loriharder-episode.png"
+                  src="/images/keith/keith-dadedge-recent.jpg"
                   alt="Keith Yackey - Founder of The Married Game"
                   fill
-                  className="object-cover object-top"
+                  className="object-cover object-center"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-transparent" />

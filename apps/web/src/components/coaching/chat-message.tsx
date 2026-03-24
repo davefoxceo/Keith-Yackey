@@ -39,7 +39,7 @@ export function ChatMessage({ message, onFeedback, isStreaming }: ChatMessagePro
         {isKeith ? (
           <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-amber-500/30">
             <Image
-              src="/images/keith/keith-headshot-recent.png"
+              src="/images/keith/keith-dadedge-recent.jpg"
               alt="Coach Keith"
               width={36}
               height={36}
