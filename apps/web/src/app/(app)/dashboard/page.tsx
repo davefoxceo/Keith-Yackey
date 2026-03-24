@@ -157,7 +157,6 @@ export default function DashboardPage() {
               <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Lagging Score</p>
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-4xl font-bold text-emerald-400">{laggingScore}</span>
-                <span className="text-lg text-slate-500">/7</span>
               </div>
               <p className="text-[11px] text-slate-500 mt-1">Intimacy in last 7 days</p>
             </div>

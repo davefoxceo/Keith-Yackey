@@ -154,7 +154,6 @@ export default function FiveDialsPage() {
               <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Lagging Score</p>
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-5xl font-bold text-emerald-400">{laggingScore}</span>
-                <span className="text-xl text-slate-500">/7</span>
               </div>
               <p className="text-xs text-slate-500 mt-2">Intimacy in last 7 days</p>
             </div>
