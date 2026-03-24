@@ -419,7 +419,7 @@ export default function LandingPage() {
               {/* Main Keith photo */}
               <div className="aspect-[4/5] rounded-3xl border border-slate-800 overflow-hidden relative">
                 <Image
-                  src="/images/keith/keith-orderofman.png"
+                  src="/images/keith/keith-story.png"
                   alt="Keith Yackey - Founder of The Married Game"
                   fill
                   className="object-cover object-top"
