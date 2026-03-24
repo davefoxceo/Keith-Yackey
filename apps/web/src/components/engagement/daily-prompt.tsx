@@ -43,7 +43,7 @@ export function DailyPrompt({ prompt, completed = false, onStart }: DailyPromptP
         <div className="flex gap-3 mb-4">
           <div className="shrink-0 w-8 h-8 rounded-full overflow-hidden ring-2 ring-amber-500/20 mt-0.5">
             <Image
-              src="/images/keith/keith-orderofman.png"
+              src="/images/keith/keith-headshot-recent.png"
               alt="Coach Keith"
               width={32}
               height={32}
