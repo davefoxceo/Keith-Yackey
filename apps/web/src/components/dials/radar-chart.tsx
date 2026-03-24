@@ -32,18 +32,31 @@ export function FiveDialsRadarChart({
 }: RadarChartProps) {
   const heights = { sm: 200, md: 300, lg: 400 };
 
-  const CustomLabel = ({ x, y, value }: { x: number; y: number; value: string }) => (
-    <text
-      x={x}
-      y={y}
-      textAnchor="middle"
-      dominantBaseline="central"
-      className="fill-slate-300 text-xs font-medium cursor-pointer hover:fill-amber-400 transition-colors"
-      onClick={() => interactive && onDialClick?.(value)}
-    >
-      {value}
-    </text>
-  );
+  const CustomLabel = ({ x, y, value }: { x: number; y: number; value: string }) => {
+    const score = scores.find((s) => s.dial === value)?.score;
+    return (
+      <g onClick={() => interactive && onDialClick?.(value)} className="cursor-pointer">
+        <text
+          x={x}
+          y={y - 8}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="fill-slate-200 text-xs font-semibold"
+        >
+          {value}
+        </text>
+        <text
+          x={x}
+          y={y + 8}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="fill-amber-400 text-[11px] font-bold"
+        >
+          {score != null ? `${score}/10` : ''}
+        </text>
+      </g>
+    );
+  };
 
   return (
     <ResponsiveContainer width="100%" height={heights[size]}>
@@ -55,7 +68,7 @@ export function FiveDialsRadarChart({
         />
         <PolarAngleAxis
           dataKey="dial"
-          tick={interactive ? CustomLabel : { fill: "#94a3b8", fontSize: 12 }}
+          tick={CustomLabel}
         />
         <PolarRadiusAxis
           angle={90}
@@ -68,32 +81,15 @@ export function FiveDialsRadarChart({
           name="Score"
           dataKey="score"
           stroke="#f59e0b"
-          strokeWidth={2}
+          strokeWidth={2.5}
           fill="#f59e0b"
-          fillOpacity={0.15}
+          fillOpacity={0.2}
           dot={{
-            r: 4,
+            r: 5,
             fill: "#f59e0b",
             stroke: "#0f172a",
             strokeWidth: 2,
           }}
-          activeDot={{
-            r: 6,
-            fill: "#fbbf24",
-            stroke: "#0f172a",
-            strokeWidth: 2,
-          }}
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-            borderRadius: "12px",
-            color: "#e2e8f0",
-            fontSize: "13px",
-            padding: "8px 12px",
-          }}
-          formatter={(value: number) => [`${value}/10`, "Score"]}
         />
       </RechartsRadar>
     </ResponsiveContainer>

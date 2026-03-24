@@ -65,7 +65,18 @@ export function ChatMessage({ message, onFeedback, isStreaming }: ChatMessagePro
               : "bg-amber-500/15 border border-amber-500/20 text-white rounded-tr-md"
           )}
         >
-          {message.content}
+          <div
+            className="whitespace-pre-wrap [&>p]:mb-3 [&>p:last-child]:mb-0"
+            dangerouslySetInnerHTML={{
+              __html: message.content
+                .replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-400 font-semibold">$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br/>')
+                .replace(/^/, '<p>')
+                .replace(/$/, '</p>'),
+            }}
+          />
           {isStreaming && isKeith && (
             <motion.span
               animate={{ opacity: [0, 1, 0] }}
