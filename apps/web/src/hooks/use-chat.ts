@@ -98,6 +98,17 @@ export function useChat(options: UseChatOptions = {}) {
         );
       } finally {
         setIsStreaming(false);
+        // Refresh sidebar conversation list
+        try {
+          const data = await api.get<{ items: Array<{ id: string; title: string; mode: string; messageCount: number; lastMessageAt: string; createdAt: string }> }>("/coaching/conversations");
+          setConversations((data.items || []).map((item) => ({
+            id: item.id,
+            title: item.title,
+            lastMessage: `${item.messageCount} messages`,
+            updatedAt: new Date(item.lastMessageAt || item.createdAt),
+            mode: (item.mode || "free") as ConversationMode,
+          })));
+        } catch { /* ignore */ }
       }
     },
     [conversationId, mode]
@@ -147,8 +158,15 @@ export function useChat(options: UseChatOptions = {}) {
 
   const loadConversations = useCallback(async () => {
     try {
-      const data = await api.get<Conversation[]>("/coaching/conversations");
-      setConversations(data);
+      const data = await api.get<{ items: Array<{ id: string; title: string; mode: string; messageCount: number; lastMessageAt: string; createdAt: string }> }>("/coaching/conversations");
+      const convs: Conversation[] = (data.items || []).map((item) => ({
+        id: item.id,
+        title: item.title,
+        lastMessage: `${item.messageCount} messages`,
+        updatedAt: new Date(item.lastMessageAt || item.createdAt),
+        mode: (item.mode || "free") as ConversationMode,
+      }));
+      setConversations(convs);
     } catch (error) {
       console.error("Load conversations error:", error);
     }

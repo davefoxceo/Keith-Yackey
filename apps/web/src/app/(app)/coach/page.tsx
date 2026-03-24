@@ -17,44 +17,28 @@ import { ModeSelector } from "@/components/coaching/mode-selector";
 import { useChat, type Conversation, type ConversationMode } from "@/hooks/use-chat";
 import { cn } from "@/lib/utils";
 
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    title: "Communication with Sarah",
-    lastMessage: "Try the mirror technique we discussed...",
-    updatedAt: new Date(Date.now() - 3600000),
-    mode: "free",
-  },
-  {
-    id: "2",
-    title: "Player accountability",
-    lastMessage: "Your consistency is paying off, brother",
-    updatedAt: new Date(Date.now() - 86400000),
-    mode: "accountability",
-  },
-  {
-    id: "3",
-    title: "Five Dials deep dive",
-    lastMessage: "Let's focus on the Producer dial this week",
-    updatedAt: new Date(Date.now() - 172800000),
-    mode: "framework",
-  },
-];
-
 export default function CoachPage() {
   const {
     messages,
     isStreaming,
     mode,
+    conversations,
     setMode,
     sendMessage,
     stopStreaming,
     giveFeedback,
+    loadConversation,
+    loadConversations,
     startNewConversation,
   } = useChat();
 
   const [showSidebar, setShowSidebar] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load real conversations from API on mount
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -98,9 +82,10 @@ export default function CoachPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              {mockConversations.map((conv) => (
+              {conversations.map((conv) => (
                 <button
                   key={conv.id}
+                  onClick={() => loadConversation(conv.id)}
                   className="w-full text-left p-3 rounded-xl hover:bg-slate-800/60 transition-all group"
                 >
                   <div className="flex items-center gap-2 mb-1">
