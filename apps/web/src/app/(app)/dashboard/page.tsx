@@ -124,9 +124,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Middle Row: Radar Chart + Health Score */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 items-stretch">
         <motion.div variants={item} className="lg:col-span-2">
-          <Card>
+          <Card className="h-full">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Five Dials Overview</CardTitle>
@@ -152,8 +152,8 @@ export default function DashboardPage() {
           </Card>
         </motion.div>
 
-        <motion.div variants={item} className="space-y-6">
-          <Card className="py-6 px-6 space-y-4">
+        <motion.div variants={item} className="flex flex-col gap-6">
+          <Card className="py-6 px-6 space-y-4 flex-1">
             <div className="text-center">
               <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Leading Score</p>
               <div className="flex items-baseline justify-center gap-1">
