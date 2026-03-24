@@ -228,7 +228,16 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.getElementById('p-seed').value = s.seed;
     document.getElementById('p-cac').value = s.cac;
     updateLabels();
-    runSimulation();
+    console.log('Tab clicked:', tab.dataset.s, 'New users:', s.newusers, 'Churn:', s.churn);
+    setTimeout(runSimulation, 100);
+  });
+});
+
+// Also auto-run when any slider is released
+params.forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    updateLabels();
+    setTimeout(runSimulation, 100);
   });
 });
 
