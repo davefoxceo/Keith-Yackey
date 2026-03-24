@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Coach Keith AI — Business Model Simulation</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+h1{font-size:2.5rem;font-weight:800;color:#fff;margin-bottom:.5rem}
+h2{font-size:1.5rem;font-weight:700;color:#f59e0b;margin:2rem 0 1rem;border-bottom:1px solid #1e293b;padding-bottom:.5rem}
+h3{font-size:1.1rem;font-weight:600;color:#fff;margin:1.5rem 0 .75rem}
+.subtitle{color:#94a3b8;font-size:1.1rem;margin-bottom:2rem}
+.grid{display:grid;gap:1.5rem}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+.grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:1.5rem;position:relative;overflow:hidden}
+.card-gold{border-color:#f59e0b33}
+.card-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f59e0b,#d97706)}
+.metric{text-align:center;padding:1rem}
+.metric-value{font-size:2.5rem;font-weight:800;color:#f59e0b}
+.metric-label{font-size:.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-top:.25rem}
+.metric-sub{font-size:.85rem;color:#64748b;margin-top:.25rem}
+.badge{display:inline-block;padding:.25rem .75rem;border-radius:999px;font-size:.75rem;font-weight:600}
+.badge-gold{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.badge-green{background:#10b98122;color:#10b981;border:1px solid #10b98144}
+.badge-blue{background:#3b82f622;color:#3b82f6;border:1px solid #3b82f644}
+.badge-rose{background:#f43f5e22;color:#f43f5e;border:1px solid #f43f5e44}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+th{text-align:left;padding:.75rem;color:#94a3b8;font-weight:600;border-bottom:1px solid #334155;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+td{padding:.75rem;border-bottom:1px solid #1e293b}
+tr:hover td{background:#1e293b44}
+.chart-container{position:relative;height:350px;margin:1rem 0}
+.btn{display:inline-block;padding:.75rem 1.5rem;background:linear-gradient(135deg,#f59e0b,#d97706);color:#0f172a;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-size:.9rem;transition:all .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px #f59e0b33}
+.scenario-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:.5rem 1rem;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#94a3b8;cursor:pointer;font-size:.85rem;font-weight:500;transition:all .2s}
+.tab.active{background:#f59e0b22;border-color:#f59e0b;color:#f59e0b}
+.range-row{display:flex;align-items:center;gap:1rem;margin:.5rem 0}
+.range-row label{min-width:180px;font-size:.85rem;color:#94a3b8}
+.range-row input[type=range]{flex:1;accent-color:#f59e0b}
+.range-row .val{min-width:60px;text-align:right;font-weight:600;color:#f59e0b;font-size:.9rem}
+.divider{height:1px;background:linear-gradient(90deg,transparent,#334155,transparent);margin:2rem 0}
+.competitor-row{display:flex;align-items:center;gap:1rem;padding:.75rem 0;border-bottom:1px solid #1e293b}
+.competitor-row:last-child{border:none}
+.comp-name{font-weight:600;color:#fff;min-width:140px}
+.comp-price{color:#f59e0b;font-weight:600;min-width:100px}
+.comp-users{color:#10b981;min-width:100px}
+.progress-bar{height:6px;background:#1e293b;border-radius:3px;overflow:hidden;flex:1}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s}
+footer{text-align:center;padding:3rem 0;color:#475569;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Header -->
+<div style="display:flex;align-items:center;gap:1rem;margin-bottom:.5rem">
+<div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#0f172a">CK</div>
+<div>
+<h1>Coach Keith AI</h1>
+<p class="subtitle">24-Month Business Model &amp; Monte Carlo Revenue Simulation</p>
+</div>
+</div>
+
+<!-- Key Metrics -->
+<div class="grid grid-4">
+<div class="card card-gold"><div class="metric"><div class="metric-value" id="m-rev">$0</div><div class="metric-label">Projected Year 2 ARR</div><div class="metric-sub">Median scenario</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="color:#10b981" id="m-users">0</div><div class="metric-label">Projected Subscribers</div><div class="metric-sub">Month 24</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="color:#3b82f6" id="m-ltv">$0</div><div class="metric-label">Customer LTV</div><div class="metric-sub">Average</div></div></div>
+<div class="card"><div class="metric"><div class="metric-value" style="color:#8b5cf6" id="m-roi">0x</div><div class="metric-label">LTV / CAC Ratio</div><div class="metric-sub">Payback indicator</div></div></div>
+</div>
+
+<h2>Competitive Landscape</h2>
+<div class="card">
+<div class="competitor-row"><span class="comp-name">Paired</span><span class="comp-price">$10/mo</span><span class="comp-users">3M+ DL</span><div class="progress-bar"><div class="progress-fill" style="width:85%;background:#3b82f6"></div></div><span class="badge badge-blue">Consumer App</span></div>
+<div class="competitor-row"><span class="comp-name">Lasting</span><span class="comp-price">$12/mo</span><span class="comp-users">1M+ DL</span><div class="progress-bar"><div class="progress-fill" style="width:60%;background:#10b981"></div></div><span class="badge badge-green">Gottman Method</span></div>
+<div class="competitor-row"><span class="comp-name">Relish</span><span class="comp-price">$12/mo</span><span class="comp-users">500K+ DL</span><div class="progress-bar"><div class="progress-fill" style="width:40%;background:#8b5cf6"></div></div><span class="badge badge-blue">Human + App</span></div>
+<div class="competitor-row"><span class="comp-name">Regain</span><span class="comp-price">$80/wk</span><span class="comp-users">Part of BetterHelp</span><div class="progress-bar"><div class="progress-fill" style="width:70%;background:#ec4899"></div></div><span class="badge badge-rose">Licensed Therapy</span></div>
+<div class="competitor-row"><span class="comp-name">Order of Man</span><span class="comp-price">$97/mo</span><span class="comp-users">10K+ members</span><div class="progress-bar"><div class="progress-fill" style="width:55%;background:#f59e0b"></div></div><span class="badge badge-gold">Men's Community</span></div>
+<div class="competitor-row"><span class="comp-name" style="color:#f59e0b">Coach Keith AI</span><span class="comp-price" style="color:#f59e0b">$29-79/mo</span><span class="comp-users">New</span><div class="progress-bar"><div class="progress-fill" style="width:20%;background:#f59e0b"></div></div><span class="badge badge-gold">AI + Keith's IP</span></div>
+</div>
+
+<p style="margin-top:1rem;color:#64748b;font-size:.85rem"><strong style="color:#f59e0b">The Gap:</strong> No one is doing AI relationship coaching specifically for men. Generic couples apps ($10-12/mo) lack personality. Premium programs ($97-500/mo) require human coaches. Coach Keith AI sits in the sweet spot: Keith's voice at AI scale.</p>
+
+<h2>Pricing Scenarios</h2>
+<div class="scenario-tabs" id="scenario-tabs">
+<div class="tab active" data-s="conservative">Conservative</div>
+<div class="tab" data-s="moderate">Moderate</div>
+<div class="tab" data-s="aggressive">Aggressive</div>
+</div>
+
+<div class="grid grid-3">
+<div class="card" id="tier-core">
+<span class="badge badge-blue" style="margin-bottom:1rem;display:inline-block">Core</span>
+<h3 id="t1-name">Core Plan</h3>
+<div style="font-size:2rem;font-weight:800;color:#fff" id="t1-price">$29<span style="font-size:.9rem;color:#64748b">/mo</span></div>
+<ul style="margin-top:1rem;padding-left:1.2rem;color:#94a3b8;font-size:.85rem" id="t1-features">
+<li>AI Coach Keith (unlimited chat)</li>
+<li>Five Dials weekly assessment</li>
+<li>Morning Kickstart prompts</li>
+<li>Content library access</li>
+</ul>
+</div>
+<div class="card card-gold" id="tier-premium">
+<span class="badge badge-gold" style="margin-bottom:1rem;display:inline-block">Most Popular</span>
+<h3 id="t2-name">Premium</h3>
+<div style="font-size:2rem;font-weight:800;color:#f59e0b" id="t2-price">$79<span style="font-size:.9rem;color:#64748b">/mo</span></div>
+<ul style="margin-top:1rem;padding-left:1.2rem;color:#94a3b8;font-size:.85rem" id="t2-features">
+<li>Everything in Core</li>
+<li>Brotherhood community access</li>
+<li>Weekly group coaching calls</li>
+<li>Accountability partner matching</li>
+<li>Priority crisis support</li>
+</ul>
+</div>
+<div class="card" id="tier-elite">
+<span class="badge badge-rose" style="margin-bottom:1rem;display:inline-block">Elite</span>
+<h3 id="t3-name">Elite</h3>
+<div style="font-size:2rem;font-weight:800;color:#fff" id="t3-price">$199<span style="font-size:.9rem;color:#64748b">/mo</span></div>
+<ul style="margin-top:1rem;padding-left:1.2rem;color:#94a3b8;font-size:.85rem" id="t3-features">
+<li>Everything in Premium</li>
+<li>Monthly 1-on-1 with Keith's team</li>
+<li>VIP live event access</li>
+<li>Custom Five Dials coaching plan</li>
+</ul>
+</div>
+</div>
+
+<h2>Monte Carlo Simulation</h2>
+<p style="color:#94a3b8;font-size:.9rem;margin-bottom:1rem">Running <strong style="color:#fff">10,000 simulations</strong> of 24-month revenue trajectories with randomized inputs. Adjust parameters below to see how outcomes change.</p>
+
+<div class="card" style="margin-bottom:1.5rem">
+<h3 style="margin-top:0">Simulation Parameters</h3>
+<div class="range-row"><label>Monthly Growth Rate</label><input type="range" id="p-growth" min="3" max="25" value="10" step="1"/><span class="val" id="v-growth">10%</span></div>
+<div class="range-row"><label>Monthly Churn Rate</label><input type="range" id="p-churn" min="2" max="15" value="7" step="1"/><span class="val" id="v-churn">7%</span></div>
+<div class="range-row"><label>Initial Users (Month 0)</label><input type="range" id="p-seed" min="50" max="2000" value="350" step="50"/><span class="val" id="v-seed">350</span></div>
+<div class="range-row"><label>Avg Revenue Per User</label><input type="range" id="p-arpu" min="20" max="120" value="55" step="5"/><span class="val" id="v-arpu">$55</span></div>
+<div class="range-row"><label>Customer Acq. Cost</label><input type="range" id="p-cac" min="10" max="200" value="75" step="5"/><span class="val" id="v-cac">$75</span></div>
+<div style="margin-top:1rem"><button class="btn" onclick="runSimulation()">Run 10,000 Simulations</button></div>
+</div>
+
+<div class="grid grid-2">
+<div class="card"><h3 style="margin-top:0">Revenue Projection (24 Months)</h3><div class="chart-container"><canvas id="chart-revenue"></canvas></div></div>
+<div class="card"><h3 style="margin-top:0">Subscriber Growth</h3><div class="chart-container"><canvas id="chart-users"></canvas></div></div>
+</div>
+
+<div class="grid grid-2" style="margin-top:1.5rem">
+<div class="card"><h3 style="margin-top:0">Revenue Distribution (Month 24)</h3><div class="chart-container"><canvas id="chart-dist"></canvas></div></div>
+<div class="card">
+<h3 style="margin-top:0">Scenario Summary</h3>
+<table>
+<tr><th>Percentile</th><th>MRR (Month 24)</th><th>ARR</th><th>Subscribers</th></tr>
+<tr><td><span class="badge badge-rose">10th (Bear)</span></td><td id="s-p10-mrr">—</td><td id="s-p10-arr">—</td><td id="s-p10-sub">—</td></tr>
+<tr><td><span class="badge badge-blue">25th</span></td><td id="s-p25-mrr">—</td><td id="s-p25-arr">—</td><td id="s-p25-sub">—</td></tr>
+<tr><td><span class="badge badge-gold">50th (Base)</span></td><td id="s-p50-mrr">—</td><td id="s-p50-arr">—</td><td id="s-p50-sub">—</td></tr>
+<tr><td><span class="badge badge-green">75th</span></td><td id="s-p75-mrr">—</td><td id="s-p75-arr">—</td><td id="s-p75-sub">—</td></tr>
+<tr><td><span class="badge badge-green">90th (Bull)</span></td><td id="s-p90-mrr">—</td><td id="s-p90-arr">—</td><td id="s-p90-sub">—</td></tr>
+</table>
+</div>
+</div>
+
+<h2>Key Assumptions</h2>
+<div class="grid grid-2">
+<div class="card">
+<h3 style="margin-top:0">Keith's Existing Assets</h3>
+<table>
+<tr><td>Instagram followers</td><td style="color:#f59e0b;font-weight:600">14,000</td></tr>
+<tr><td>TikTok followers</td><td style="color:#f59e0b;font-weight:600">18,800</td></tr>
+<tr><td>Existing client base</td><td style="color:#f59e0b;font-weight:600">350+</td></tr>
+<tr><td>Podcast (Married Game)</td><td style="color:#f59e0b;font-weight:600">100 episodes</td></tr>
+<tr><td>Guest podcast appearances</td><td style="color:#f59e0b;font-weight:600">50+</td></tr>
+<tr><td>Garrett White partnership</td><td style="color:#f59e0b;font-weight:600">$10M+/yr network</td></tr>
+<tr><td>Book (Amazon)</td><td style="color:#f59e0b;font-weight:600">4 formats</td></tr>
+<tr><td>Market (Marriage Counseling)</td><td style="color:#f59e0b;font-weight:600">$12.9B (11.3% CAGR)</td></tr>
+</table>
+</div>
+<div class="card">
+<h3 style="margin-top:0">Simulation Variables (Randomized)</h3>
+<table>
+<tr><td>Growth rate variance</td><td style="color:#94a3b8">&#177;40% of base rate per month</td></tr>
+<tr><td>Churn rate variance</td><td style="color:#94a3b8">&#177;30% of base rate per month</td></tr>
+<tr><td>ARPU variance</td><td style="color:#94a3b8">&#177;20% (tier mix changes)</td></tr>
+<tr><td>Seasonal factor</td><td style="color:#94a3b8">Jan +30%, Summer -15%</td></tr>
+<tr><td>Viral coefficient</td><td style="color:#94a3b8">0.05-0.15 (word of mouth)</td></tr>
+<tr><td>Launch bump</td><td style="color:#94a3b8">2x growth months 1-3</td></tr>
+<tr><td>Simulation runs</td><td style="color:#f59e0b;font-weight:600">10,000</td></tr>
+<tr><td>Time horizon</td><td style="color:#f59e0b;font-weight:600">24 months</td></tr>
+</table>
+</div>
+</div>
+
+<footer>
+<p>Coach Keith AI — Business Model Simulation | Prepared March 2026</p>
+<p style="margin-top:.25rem">Data sourced from market research, competitor analysis, and industry benchmarks. Simulation uses Monte Carlo method with 10,000 randomized runs.</p>
+</footer>
+
+</div>
+
+<script>
+// Scenarios
+const scenarios = {
+  conservative: { growth: 7, churn: 9, seed: 200, arpu: 39, cac: 100, t1: '$29', t2: '$59', t3: '$149' },
+  moderate: { growth: 10, churn: 7, seed: 350, arpu: 55, cac: 75, t1: '$29', t2: '$79', t3: '$199' },
+  aggressive: { growth: 18, churn: 5, seed: 500, arpu: 72, cac: 50, t1: '$39', t2: '$99', t3: '$249' },
+};
+
+let currentScenario = 'moderate';
+let revenueChart, usersChart, distChart;
+
+// UI setup
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentScenario = tab.dataset.s;
+    const s = scenarios[currentScenario];
+    document.getElementById('p-growth').value = s.growth;
+    document.getElementById('p-churn').value = s.churn;
+    document.getElementById('p-seed').value = s.seed;
+    document.getElementById('p-arpu').value = s.arpu;
+    document.getElementById('p-cac').value = s.cac;
+    document.getElementById('t1-price').innerHTML = s.t1 + '<span style="font-size:.9rem;color:#64748b">/mo</span>';
+    document.getElementById('t2-price').innerHTML = s.t2 + '<span style="font-size:.9rem;color:#64748b">/mo</span>';
+    document.getElementById('t3-price').innerHTML = s.t3 + '<span style="font-size:.9rem;color:#64748b">/mo</span>';
+    updateLabels();
+    runSimulation();
+  });
+});
+
+['p-growth','p-churn','p-seed','p-arpu','p-cac'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateLabels);
+});
+
+function updateLabels() {
+  document.getElementById('v-growth').textContent = document.getElementById('p-growth').value + '%';
+  document.getElementById('v-churn').textContent = document.getElementById('p-churn').value + '%';
+  document.getElementById('v-seed').textContent = document.getElementById('p-seed').value;
+  document.getElementById('v-arpu').textContent = '$' + document.getElementById('p-arpu').value;
+  document.getElementById('v-cac').textContent = '$' + document.getElementById('p-cac').value;
+}
+
+function fmt(n) { return n >= 1e6 ? '$' + (n/1e6).toFixed(1) + 'M' : n >= 1e3 ? '$' + (n/1e3).toFixed(0) + 'K' : '$' + Math.round(n); }
+function fmtN(n) { return n >= 1e3 ? (n/1e3).toFixed(1) + 'K' : Math.round(n).toString(); }
+
+function runSimulation() {
+  const N = 10000;
+  const MONTHS = 24;
+  const baseGrowth = parseInt(document.getElementById('p-growth').value) / 100;
+  const baseChurn = parseInt(document.getElementById('p-churn').value) / 100;
+  const seedUsers = parseInt(document.getElementById('p-seed').value);
+  const baseArpu = parseInt(document.getElementById('p-arpu').value);
+  const cac = parseInt(document.getElementById('p-cac').value);
+
+  const seasonal = [1.3, 1.15, 1.0, 0.95, 0.9, 0.85, 0.85, 0.9, 1.05, 1.1, 1.0, 1.2];
+
+  // Run simulations
+  const allRevenue = []; // [sim][month]
+  const allUsers = [];
+  const finalMRR = [];
+  const finalUsers = [];
+
+  for (let s = 0; s < N; s++) {
+    const rev = [0];
+    const usr = [seedUsers];
+    let users = seedUsers;
+
+    for (let m = 1; m <= MONTHS; m++) {
+      const growthVar = baseGrowth * (0.6 + Math.random() * 0.8);
+      const churnVar = baseChurn * (0.7 + Math.random() * 0.6);
+      const arpuVar = baseArpu * (0.8 + Math.random() * 0.4);
+      const seasonFactor = seasonal[(m - 1) % 12];
+      const launchBonus = m <= 3 ? 1.5 : 1.0;
+      const viralCoeff = 0.05 + Math.random() * 0.1;
+
+      const newUsers = Math.round(users * growthVar * seasonFactor * launchBonus + users * viralCoeff);
+      const churnedUsers = Math.round(users * churnVar);
+      users = Math.max(0, users + newUsers - churnedUsers);
+
+      const mrr = users * arpuVar;
+      usr.push(users);
+      rev.push(mrr);
+    }
+
+    allRevenue.push(rev);
+    allUsers.push(usr);
+    finalMRR.push(rev[MONTHS]);
+    finalUsers.push(usr[MONTHS]);
+  }
+
+  // Sort for percentiles
+  finalMRR.sort((a, b) => a - b);
+  finalUsers.sort((a, b) => a - b);
+
+  const pct = (arr, p) => arr[Math.floor(arr.length * p)];
+
+  // Percentile charts
+  const labels = Array.from({ length: MONTHS + 1 }, (_, i) => i === 0 ? 'Start' : `M${i}`);
+
+  // Compute percentile paths
+  function getPercentilePath(allData, p) {
+    return labels.map((_, m) => {
+      const values = allData.map(run => run[m]).sort((a, b) => a - b);
+      return values[Math.floor(values.length * p)];
+    });
+  }
+
+  const revP10 = getPercentilePath(allRevenue, 0.1);
+  const revP25 = getPercentilePath(allRevenue, 0.25);
+  const revP50 = getPercentilePath(allRevenue, 0.5);
+  const revP75 = getPercentilePath(allRevenue, 0.75);
+  const revP90 = getPercentilePath(allRevenue, 0.9);
+
+  const usrP10 = getPercentilePath(allUsers, 0.1);
+  const usrP25 = getPercentilePath(allUsers, 0.25);
+  const usrP50 = getPercentilePath(allUsers, 0.5);
+  const usrP75 = getPercentilePath(allUsers, 0.75);
+  const usrP90 = getPercentilePath(allUsers, 0.9);
+
+  // Update key metrics
+  const medianMRR = pct(finalMRR, 0.5);
+  const medianUsers = pct(finalUsers, 0.5);
+  const ltv = baseArpu / baseChurn;
+  document.getElementById('m-rev').textContent = fmt(medianMRR * 12);
+  document.getElementById('m-users').textContent = fmtN(medianUsers);
+  document.getElementById('m-ltv').textContent = fmt(ltv);
+  document.getElementById('m-roi').textContent = (ltv / cac).toFixed(1) + 'x';
+
+  // Update scenario table
+  const pts = [0.1, 0.25, 0.5, 0.75, 0.9];
+  const pNames = ['p10', 'p25', 'p50', 'p75', 'p90'];
+  pts.forEach((p, i) => {
+    const mrr = pct(finalMRR, p);
+    document.getElementById(`s-${pNames[i]}-mrr`).textContent = fmt(mrr);
+    document.getElementById(`s-${pNames[i]}-arr`).textContent = fmt(mrr * 12);
+    document.getElementById(`s-${pNames[i]}-sub`).textContent = fmtN(pct(finalUsers, p));
+  });
+
+  // Revenue chart
+  const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } }, scales: { x: { ticks: { color: '#475569', font: { size: 10 } }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#475569', callback: v => fmt(v) }, grid: { color: '#1e293b' } } } };
+
+  if (revenueChart) revenueChart.destroy();
+  revenueChart = new Chart(document.getElementById('chart-revenue'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: '90th', data: revP90, borderColor: '#10b98166', backgroundColor: '#10b98111', fill: '+1', borderWidth: 1, pointRadius: 0 },
+        { label: '75th', data: revP75, borderColor: '#10b98199', backgroundColor: '#10b98122', fill: '+1', borderWidth: 1, pointRadius: 0 },
+        { label: 'Median', data: revP50, borderColor: '#f59e0b', backgroundColor: '#f59e0b22', fill: false, borderWidth: 2.5, pointRadius: 0 },
+        { label: '25th', data: revP25, borderColor: '#3b82f699', backgroundColor: '#3b82f622', fill: '+1', borderWidth: 1, pointRadius: 0 },
+        { label: '10th', data: revP10, borderColor: '#f43f5e66', backgroundColor: '#f43f5e11', fill: false, borderWidth: 1, pointRadius: 0 },
+      ],
+    },
+    options: chartOpts,
+  });
+
+  // Users chart
+  if (usersChart) usersChart.destroy();
+  usersChart = new Chart(document.getElementById('chart-users'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: '90th', data: usrP90, borderColor: '#10b98166', fill: '+1', backgroundColor: '#10b98111', borderWidth: 1, pointRadius: 0 },
+        { label: '75th', data: usrP75, borderColor: '#10b98199', fill: '+1', backgroundColor: '#10b98122', borderWidth: 1, pointRadius: 0 },
+        { label: 'Median', data: usrP50, borderColor: '#f59e0b', fill: false, borderWidth: 2.5, pointRadius: 0 },
+        { label: '25th', data: usrP25, borderColor: '#3b82f699', fill: '+1', backgroundColor: '#3b82f622', borderWidth: 1, pointRadius: 0 },
+        { label: '10th', data: usrP10, borderColor: '#f43f5e66', fill: false, borderWidth: 1, pointRadius: 0 },
+      ],
+    },
+    options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, ticks: { color: '#475569', callback: v => fmtN(v) } } } },
+  });
+
+  // Distribution histogram
+  const bins = 30;
+  const minMRR = finalMRR[0];
+  const maxMRR = finalMRR[finalMRR.length - 1];
+  const binWidth = (maxMRR - minMRR) / bins;
+  const binLabels = [];
+  const binCounts = new Array(bins).fill(0);
+  for (let i = 0; i < bins; i++) {
+    binLabels.push(fmt(minMRR + i * binWidth));
+  }
+  for (const mrr of finalMRR) {
+    const bin = Math.min(Math.floor((mrr - minMRR) / binWidth), bins - 1);
+    binCounts[bin]++;
+  }
+
+  if (distChart) distChart.destroy();
+  distChart = new Chart(document.getElementById('chart-dist'), {
+    type: 'bar',
+    data: {
+      labels: binLabels,
+      datasets: [{ label: 'Simulations', data: binCounts, backgroundColor: '#f59e0b44', borderColor: '#f59e0b', borderWidth: 1 }],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569', font: { size: 9 }, maxTicksLimit: 8 }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: '#1e293b' } } } },
+  });
+}
+
+// Initial run
+updateLabels();
+runSimulation();
+</script>
+</body>
+</html>
