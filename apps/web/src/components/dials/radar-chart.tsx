@@ -66,7 +66,7 @@ export function FiveDialsRadarChart({
 
   return (
     <ResponsiveContainer width="100%" height={heights[size]}>
-      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="95%">
+      <RechartsRadar data={scores} cx="50%" cy="52%" outerRadius="55%">
         <PolarGrid
           stroke="#334155"
           strokeDasharray="3 3"
@@ -76,6 +76,7 @@ export function FiveDialsRadarChart({
           dataKey="dial"
           tick={CustomLabel}
           tickLine={false}
+          dy={5}
         />
         <PolarRadiusAxis
           angle={90}
