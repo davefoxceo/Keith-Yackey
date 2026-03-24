@@ -134,17 +134,17 @@ export default function FiveDialsPage() {
         </Link>
       </motion.div>
 
-      {/* Radar + Health Score */}
-      <div className="grid lg:grid-cols-4 gap-6">
-        <motion.div variants={item} className="lg:col-span-3">
-          <Card>
+      {/* Radar + Scores */}
+      <div className="grid lg:grid-cols-3 gap-6 items-stretch">
+        <motion.div variants={item} className="lg:col-span-2">
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Your Five Dials</CardTitle>
             </CardHeader>
             <CardContent>
               <FiveDialsRadarChart
                 scores={radarData}
-                size="lg"
+                size="md"
                 interactive
               />
             </CardContent>
