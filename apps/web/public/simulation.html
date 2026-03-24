@@ -108,9 +108,9 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 <!-- Pricing -->
 <h2>Pricing Model</h2>
 <div id="scenario-tabs" style="margin-bottom:1rem">
-<span class="tab active" data-s="conservative">Conservative</span>
+<span class="tab active" data-s="conservative">Conservative (Default)</span>
 <span class="tab" data-s="moderate">Moderate</span>
-<span class="tab" data-s="aggressive">Aggressive</span>
+<span class="tab" data-s="aggressive">Optimistic</span>
 </div>
 
 <div class="grid grid-3">
@@ -133,12 +133,12 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 
 <div class="card" style="margin:1.25rem 0">
 <h3 style="margin-top:0">Adjust Parameters</h3>
-<div class="range-row"><label>New users/month (paid + organic)</label><input type="range" id="p-newusers" min="20" max="500" value="80" step="10"/><span class="val" id="v-newusers">80</span></div>
-<div class="range-row"><label>Monthly churn rate</label><input type="range" id="p-churn" min="3" max="18" value="8" step="1"/><span class="val" id="v-churn">8%</span></div>
-<div class="range-row"><label>Avg revenue per user (blended)</label><input type="range" id="p-arpu" min="25" max="120" value="52" step="1"/><span class="val" id="v-arpu">$52</span></div>
-<div class="range-row"><label>Monthly user growth rate</label><input type="range" id="p-acqgrowth" min="0" max="8" value="3" step="1"/><span class="val" id="v-acqgrowth">3%</span></div>
-<div class="range-row"><label>Existing users at launch</label><input type="range" id="p-seed" min="0" max="500" value="100" step="25"/><span class="val" id="v-seed">100</span></div>
-<div class="range-row"><label>Customer acquisition cost</label><input type="range" id="p-cac" min="30" max="300" value="120" step="10"/><span class="val" id="v-cac">$120</span></div>
+<div class="range-row"><label>New users/month (paid + organic)</label><input type="range" id="p-newusers" min="10" max="500" value="30" step="5"/><span class="val" id="v-newusers">30</span></div>
+<div class="range-row"><label>Monthly churn rate</label><input type="range" id="p-churn" min="3" max="20" value="12" step="1"/><span class="val" id="v-churn">12%</span></div>
+<div class="range-row"><label>Avg revenue per user (blended)</label><input type="range" id="p-arpu" min="25" max="120" value="38" step="1"/><span class="val" id="v-arpu">$38</span></div>
+<div class="range-row"><label>Monthly acquisition growth rate</label><input type="range" id="p-acqgrowth" min="0" max="8" value="1" step="1"/><span class="val" id="v-acqgrowth">1%</span></div>
+<div class="range-row"><label>Existing users at launch</label><input type="range" id="p-seed" min="0" max="500" value="50" step="25"/><span class="val" id="v-seed">50</span></div>
+<div class="range-row"><label>Customer acquisition cost</label><input type="range" id="p-cac" min="30" max="300" value="175" step="10"/><span class="val" id="v-cac">$175</span></div>
 <div style="margin-top:.75rem"><button class="btn" id="run-btn">Run 10,000 Simulations</button> <span id="run-status" style="color:#64748b;font-size:.8rem;margin-left:.5rem"></span></div>
 </div>
 
@@ -193,9 +193,9 @@ footer{text-align:center;padding:2rem 0;color:#475569;font-size:.75rem}
 
 <script>
 const scenarios = {
-  conservative: { newusers: 50, churn: 10, arpu: 42, acqgrowth: 2, seed: 75, cac: 150 },
-  moderate:     { newusers: 80, churn: 8,  arpu: 52, acqgrowth: 3, seed: 100, cac: 120 },
-  aggressive:   { newusers: 150, churn: 6, arpu: 65, acqgrowth: 5, seed: 200, cac: 80 },
+  conservative: { newusers: 30, churn: 12, arpu: 38, acqgrowth: 1, seed: 50, cac: 175 },
+  moderate:     { newusers: 60, churn: 9,  arpu: 48, acqgrowth: 2, seed: 100, cac: 130 },
+  aggressive:   { newusers: 120, churn: 6, arpu: 62, acqgrowth: 4, seed: 200, cac: 90 },
 };
 
 let revenueChart, usersChart, distChart;
