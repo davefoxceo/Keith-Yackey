@@ -31,11 +31,11 @@ const dialQuestions: DialQuestion[] = [
     icon: <Baby className="w-8 h-8" />,
     color: "#3b82f6",
     question:
-      "How are you showing up as a father? Are you actively leading, present with your kids, involved in their lives — or are you checked out, letting your wife handle it all while you scroll your phone?",
+      "How many days this week did you show up as an intentional, present father? Not just being in the room — actually leading, connecting, modeling the man you want your kids to become.",
     anchors: {
-      low: "Absent, uninvolved, leaving it all to her",
-      mid: "Present sometimes, could be more intentional",
-      high: "Active leader, deeply involved, kids look up to you",
+      low: "0 days — checked out all week",
+      mid: "3-4 days — showed up but not consistent",
+      high: "7 days — crushed it every day",
     },
   },
   {
@@ -43,11 +43,11 @@ const dialQuestions: DialQuestion[] = [
     icon: <Heart className="w-8 h-8" />,
     color: "#ec4899",
     question:
-      "Are you her best friend and true teammate — or just a roommate? When's the last time she looked at you and you could FEEL the connection? Be brutally honest here, brother.",
+      "How many days this week did you intentionally invest in your marriage? Not just coexisting — actually connecting, communicating, making her feel chosen. Be brutally honest, brother.",
     anchors: {
-      low: "Roommates, disconnected, she's pulled away",
-      mid: "Okay but on autopilot, room for growth",
-      high: "Deep connection, true teammates, she feels seen",
+      low: "0 days — roommates all week",
+      mid: "3-4 days — some effort, inconsistent",
+      high: "7 days — she felt chosen every day",
     },
   },
   {
@@ -55,11 +55,11 @@ const dialQuestions: DialQuestion[] = [
     icon: <DollarSign className="w-8 h-8" />,
     color: "#10b981",
     question:
-      "Are you providing? Building? Or are finances a source of stress and arguments? A woman wants to know her man is handling business. Be honest with yourself here — no one's watching.",
+      "How many days this week did you show up with purpose, ambition, and financial discipline? Not just clocking hours — building something, handling business, moving the needle.",
     anchors: {
-      low: "Financial stress, not providing stability",
-      mid: "Stable but not growing, some anxiety",
-      high: "Thriving, building wealth, she feels secure",
+      low: "0 days — coasted or stressed",
+      mid: "3-4 days — productive but unfocused",
+      high: "7 days — driven and disciplined daily",
     },
   },
   {
@@ -67,11 +67,11 @@ const dialQuestions: DialQuestion[] = [
     icon: <Gamepad2 className="w-8 h-8" />,
     color: "#f59e0b",
     question:
-      "Are you FUN? Are you the guy she fell in love with — spontaneous, adventurous, making her laugh? Or have you become boring, predictable, the guy who just watches TV every night?",
+      "How many days this week did you move your body, have fun, or do something spontaneous? The Player dial is about staying alive — not becoming the boring, predictable guy she didn't marry.",
     anchors: {
-      low: "Boring, predictable, no fun, all obligations",
-      mid: "Some fun but inconsistent, could be better",
-      high: "Spontaneous, playful, she lights up around you",
+      low: "0 days — couch all week",
+      mid: "3-4 days — some movement, some fun",
+      high: "7 days — active, fun, fully alive",
     },
   },
   {
@@ -79,18 +79,18 @@ const dialQuestions: DialQuestion[] = [
     icon: <Zap className="w-8 h-8" />,
     color: "#8b5cf6",
     question:
-      "Do you do what you say you're going to do, when you say you're going to do it — without fail? This is the foundation of everything. If she can't trust your word, nothing else matters.",
+      "How many days this week did you keep every promise you made to yourself? Not to her, not to your boss — to YOU. Did you do what you said you'd do, when you said you'd do it?",
     anchors: {
-      low: "Break promises, inconsistent, she can't rely on you",
-      mid: "Usually follow through, slip sometimes",
-      high: "Man of your word, 100% follow-through, rock solid",
+      low: "0 days — broke commitments all week",
+      mid: "3-4 days — mostly reliable",
+      high: "7 days — word is bond, zero excuses",
     },
   },
 ];
 
 export default function AssessmentPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [scores, setScores] = useState<number[]>([5, 5, 5, 5, 5]);
+  const [scores, setScores] = useState<number[]>([4, 4, 4, 4, 4]);
   const [submitted, setSubmitted] = useState(false);
 
   const isReview = currentStep === dialQuestions.length;
@@ -217,7 +217,7 @@ export default function AssessmentPage() {
                       <span className="text-2xl font-bold text-white">
                         {scores[i]}
                       </span>
-                      <span className="text-sm text-slate-500">/10</span>
+                      <span className="text-sm text-slate-500">/7</span>
                     </div>
                   </div>
                 ))}
@@ -268,7 +268,7 @@ export default function AssessmentPage() {
               </div>
 
               {/* Keith's question */}
-              <div className="mb-8 p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+              <div className="mb-8 p-4 rounded-xl bg-amber-500/5 border border-amber-500/7">
                 <p className="text-[15px] text-slate-300 leading-relaxed italic">
                   &ldquo;{dialQuestions[currentStep].question}&rdquo;
                 </p>
@@ -287,7 +287,7 @@ export default function AssessmentPage() {
                 >
                   {scores[currentStep]}
                 </motion.span>
-                <span className="text-2xl text-slate-500 ml-1">/10</span>
+                <span className="text-2xl text-slate-500 ml-1">/7</span>
               </div>
 
               {/* Slider */}
@@ -295,8 +295,8 @@ export default function AssessmentPage() {
                 <Slider
                   value={[scores[currentStep]]}
                   onValueChange={handleScoreChange}
-                  min={1}
-                  max={10}
+                  min={0}
+                  max={7}
                   step={1}
                 />
               </div>
