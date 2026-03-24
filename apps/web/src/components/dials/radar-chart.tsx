@@ -30,7 +30,7 @@ export function FiveDialsRadarChart({
   interactive = false,
   onDialClick,
 }: RadarChartProps) {
-  const heights = { sm: 200, md: 300, lg: 400 };
+  const heights = { sm: 280, md: 420, lg: 500 };
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const CustomLabel = (props: any) => {
@@ -44,19 +44,19 @@ export function FiveDialsRadarChart({
       >
         <text
           x={x}
-          y={y - 10}
+          y={y - 9}
           textAnchor="middle"
           dominantBaseline="central"
-          style={{ fill: '#e2e8f0', fontSize: 13, fontWeight: 600 }}
+          style={{ fill: '#e2e8f0', fontSize: 14, fontWeight: 600 }}
         >
           {label}
         </text>
         <text
           x={x}
-          y={y + 10}
+          y={y + 11}
           textAnchor="middle"
           dominantBaseline="central"
-          style={{ fill: '#f59e0b', fontSize: 12, fontWeight: 700 }}
+          style={{ fill: '#f59e0b', fontSize: 13, fontWeight: 700 }}
         >
           {score != null ? `${score}/7` : ''}
         </text>
@@ -66,7 +66,7 @@ export function FiveDialsRadarChart({
 
   return (
     <ResponsiveContainer width="100%" height={heights[size]}>
-      <RechartsRadar data={scores} cx="50%" cy="52%" outerRadius="55%">
+      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="60%">
         <PolarGrid
           stroke="#334155"
           strokeDasharray="3 3"
