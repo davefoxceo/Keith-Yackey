@@ -30,7 +30,7 @@ export function FiveDialsRadarChart({
   interactive = false,
   onDialClick,
 }: RadarChartProps) {
-  const heights = { sm: 200, md: 300, lg: 400 };
+  const heights = { sm: 250, md: 450, lg: 550 };
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const CustomLabel = (props: any) => {
@@ -66,7 +66,7 @@ export function FiveDialsRadarChart({
 
   return (
     <ResponsiveContainer width="100%" height={heights[size]}>
-      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="65%">
+      <RechartsRadar data={scores} cx="50%" cy="50%" outerRadius="72%">
         <PolarGrid
           stroke="#334155"
           strokeDasharray="3 3"
