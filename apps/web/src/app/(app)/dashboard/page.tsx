@@ -23,12 +23,16 @@ import { MilestoneBadge } from "@/components/engagement/milestone-badge";
 import { DailyPrompt } from "@/components/engagement/daily-prompt";
 
 const radarData = [
-  { dial: "Parent", score: 7.5, fullMark: 10 as const },
-  { dial: "Partner", score: 6.0, fullMark: 10 as const },
-  { dial: "Producer", score: 5.5, fullMark: 10 as const },
-  { dial: "Player", score: 8.0, fullMark: 10 as const },
-  { dial: "Power", score: 4.5, fullMark: 10 as const },
+  { dial: "Parent", score: 5, fullMark: 7 as const },
+  { dial: "Partner", score: 4, fullMark: 7 as const },
+  { dial: "Producer", score: 6, fullMark: 7 as const },
+  { dial: "Player", score: 7, fullMark: 7 as const },
+  { dial: "Power", score: 3, fullMark: 7 as const },
 ];
+
+// Leading Score = sum of all dials (max 35), Lagging Score = sex in last 7 days
+const leadingScore = radarData.reduce((sum, d) => sum + d.score, 0);
+const laggingScore = 3; // times in last 7 days
 
 const milestones = [
   { title: "First Check-In", description: "Completed your first assessment", icon: "star" as const, achieved: true, date: "Mar 15" },
@@ -139,8 +143,24 @@ export default function DashboardPage() {
         </motion.div>
 
         <motion.div variants={item} className="space-y-6">
-          <Card className="flex items-center justify-center py-6">
-            <HealthScore score={72} previousScore={65} />
+          <Card className="py-6 px-6 space-y-4">
+            <div className="text-center">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Leading Score</p>
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-4xl font-bold text-amber-400">{leadingScore}</span>
+                <span className="text-lg text-slate-500">/35</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1">Sum of all 5 dials this week</p>
+            </div>
+            <div className="h-px bg-slate-800" />
+            <div className="text-center">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Lagging Score</p>
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-4xl font-bold text-emerald-400">{laggingScore}</span>
+                <span className="text-lg text-slate-500">/7</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1">Intimacy in last 7 days</p>
+            </div>
           </Card>
 
           <Card>

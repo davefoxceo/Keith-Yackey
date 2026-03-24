@@ -24,41 +24,41 @@ import { HealthScore } from "@/components/dials/health-score";
 const dials = [
   {
     name: "Parent",
-    score: 7.5,
-    previousScore: 6.8,
-    description: "Are you actively leading as a father? Present, involved, and effective with your kids.",
+    score: 5,
+    previousScore: 4,
+    description: "How many days this week did you show up as an intentional, present father?",
     icon: <Heart className="w-5 h-5" style={{ color: "#3b82f6" }} />,
     color: "#3b82f6",
   },
   {
     name: "Partner",
-    score: 6.0,
-    previousScore: 5.5,
-    description: "Are you her best friend and true teammate — or just a roommate?",
+    score: 4,
+    previousScore: 3,
+    description: "How many days this week did you invest in your marriage — friendship, communication, connection?",
     icon: <Sparkles className="w-5 h-5" style={{ color: "#ec4899" }} />,
     color: "#ec4899",
   },
   {
     name: "Producer",
-    score: 5.5,
-    previousScore: 5.0,
-    description: "Are you providing financial stability and contributing economically?",
+    score: 6,
+    previousScore: 5,
+    description: "How many days this week did you show up with purpose, ambition, and financial discipline?",
     icon: <DollarSign className="w-5 h-5" style={{ color: "#10b981" }} />,
     color: "#10b981",
   },
   {
     name: "Player",
-    score: 8.0,
-    previousScore: 7.2,
-    description: "Are you fun, playful, and spontaneous — or boring and predictable?",
+    score: 7,
+    previousScore: 5,
+    description: "How many days this week did you move your body, have fun, or do something spontaneous?",
     icon: <Gamepad2 className="w-5 h-5" style={{ color: "#f59e0b" }} />,
     color: "#f59e0b",
   },
   {
     name: "Power",
-    score: 4.5,
-    previousScore: 4.0,
-    description: "Do you do what you say, when you say it? Are you a man of your word?",
+    score: 3,
+    previousScore: 2,
+    description: "How many days this week did you keep your word to yourself — every commitment, no excuses?",
     icon: <Zap className="w-5 h-5" style={{ color: "#8b5cf6" }} />,
     color: "#8b5cf6",
   },
@@ -67,15 +67,18 @@ const dials = [
 const radarData = dials.map((d) => ({
   dial: d.name,
   score: d.score,
-  fullMark: 10 as const,
+  fullMark: 7 as const,
 }));
 
+const leadingScore = dials.reduce((sum, d) => sum + d.score, 0);
+const laggingScore = 3;
+
 const trendData = [
-  { date: "Week 1", parent: 5, partner: 4, producer: 3, player: 6, power: 3 },
-  { date: "Week 2", parent: 5.5, partner: 4.5, producer: 3.5, player: 6.5, power: 3 },
-  { date: "Week 3", parent: 6, partner: 5, producer: 4, player: 7, power: 3.5 },
-  { date: "Week 4", parent: 6.8, partner: 5.5, producer: 5, player: 7.2, power: 4 },
-  { date: "Week 5", parent: 7.5, partner: 6, producer: 5.5, player: 8, power: 4.5 },
+  { date: "Week 1", parent: 2, partner: 1, producer: 3, player: 4, power: 1 },
+  { date: "Week 2", parent: 3, partner: 2, producer: 4, player: 5, power: 2 },
+  { date: "Week 3", parent: 4, partner: 3, producer: 4, player: 5, power: 2 },
+  { date: "Week 4", parent: 4, partner: 3, producer: 5, player: 6, power: 3 },
+  { date: "Week 5", parent: 5, partner: 4, producer: 6, player: 7, power: 3 },
 ];
 
 const challenges = [
@@ -137,8 +140,24 @@ export default function FiveDialsPage() {
           </Card>
         </motion.div>
         <motion.div variants={item}>
-          <Card className="flex items-center justify-center py-8 h-full">
-            <HealthScore score={72} previousScore={65} />
+          <Card className="py-8 px-6 h-full flex flex-col justify-center space-y-6">
+            <div className="text-center">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Leading Score</p>
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-5xl font-bold text-amber-400">{leadingScore}</span>
+                <span className="text-xl text-slate-500">/35</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">Days you crushed it across all 5 dials</p>
+            </div>
+            <div className="h-px bg-slate-800" />
+            <div className="text-center">
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Lagging Score</p>
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-5xl font-bold text-emerald-400">{laggingScore}</span>
+                <span className="text-xl text-slate-500">/7</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">Intimacy in last 7 days</p>
+            </div>
           </Card>
         </motion.div>
       </div>

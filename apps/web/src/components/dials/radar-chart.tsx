@@ -14,7 +14,7 @@ import {
 interface DialScore {
   dial: string;
   score: number;
-  fullMark: 10;
+  fullMark: 7;
 }
 
 interface RadarChartProps {
@@ -58,7 +58,7 @@ export function FiveDialsRadarChart({
           dominantBaseline="central"
           style={{ fill: '#f59e0b', fontSize: 12, fontWeight: 700 }}
         >
-          {score != null ? `${score}/10` : ''}
+          {score != null ? `${score}/7` : ''}
         </text>
       </g>
     );
@@ -79,9 +79,9 @@ export function FiveDialsRadarChart({
         />
         <PolarRadiusAxis
           angle={90}
-          domain={[0, 10]}
+          domain={[0, 7]}
           tick={{ fill: "#475569", fontSize: 10 }}
-          tickCount={6}
+          tickCount={8}
           axisLine={false}
         />
         <Radar

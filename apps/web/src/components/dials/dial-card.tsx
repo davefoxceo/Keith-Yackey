@@ -59,7 +59,7 @@ export function DialCard({
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-800">
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${(score / 10) * 100}%` }}
+          animate={{ width: `${(score / 7) * 100}%` }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
           className="h-full rounded-full"
           style={{ backgroundColor: color }}
@@ -82,7 +82,7 @@ export function DialCard({
       <div className="flex items-end justify-between">
         <div className="flex items-baseline gap-1">
           <span className="text-2xl font-bold text-white">{score}</span>
-          <span className="text-sm text-slate-500">/10</span>
+          <span className="text-sm text-slate-500">/7</span>
         </div>
         {diff && (
           <div className="flex items-center gap-1">

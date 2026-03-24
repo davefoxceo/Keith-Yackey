@@ -46,12 +46,12 @@ export function TrendChart({ data }: TrendChartProps) {
           axisLine={false}
         />
         <YAxis
-          domain={[0, 10]}
+          domain={[0, 7]}
           stroke="#475569"
           fontSize={11}
           tickLine={false}
           axisLine={false}
-          tickCount={6}
+          tickCount={8}
         />
         <Tooltip
           contentStyle={{
