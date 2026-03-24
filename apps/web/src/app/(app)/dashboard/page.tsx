@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { InfoTip } from "@/components/ui/tooltip";
 import {
   MessageCircle,
   Target,
@@ -155,7 +156,7 @@ export default function DashboardPage() {
         <motion.div variants={item} className="flex flex-col gap-6">
           <Card className="py-6 px-6 space-y-4 flex-1">
             <div className="text-center">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Leading Score</p>
+              <InfoTip tip="Your total across all 5 dials this week. Max 35 — one point for each day you showed up."><p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Leading Score</p></InfoTip>
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-4xl font-bold text-amber-400">{leadingScore}</span>
                 <span className="text-lg text-slate-500">/35</span>
@@ -164,7 +165,7 @@ export default function DashboardPage() {
             </div>
             <div className="h-px bg-slate-800" />
             <div className="text-center">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Lagging Score</p>
+              <InfoTip tip="How many times you were intimate this week. This is the result that follows when your dials are high."><p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Lagging Score</p></InfoTip>
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-4xl font-bold text-emerald-400">{laggingScore}</span>
               </div>

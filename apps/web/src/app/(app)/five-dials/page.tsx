@@ -20,6 +20,7 @@ import { FiveDialsRadarChart } from "@/components/dials/radar-chart";
 import { DialCard } from "@/components/dials/dial-card";
 import { TrendChart } from "@/components/dials/trend-chart";
 import { HealthScore } from "@/components/dials/health-score";
+import { InfoTip } from "@/components/ui/tooltip";
 
 const dials = [
   {
@@ -153,7 +154,7 @@ export default function FiveDialsPage() {
         <motion.div variants={item}>
           <Card className="py-8 px-6 h-full flex flex-col justify-center space-y-6">
             <div className="text-center">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Leading Score</p>
+              <InfoTip tip="Your total across all 5 dials this week. Max 35 — one point for each day you showed up."><p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Leading Score</p></InfoTip>
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-5xl font-bold text-amber-400">{leadingScore}</span>
                 <span className="text-xl text-slate-500">/35</span>
@@ -162,7 +163,7 @@ export default function FiveDialsPage() {
             </div>
             <div className="h-px bg-slate-800" />
             <div className="text-center">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Lagging Score</p>
+              <InfoTip tip="How many times you were intimate this week. This is the result that follows when your dials are high."><p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Lagging Score</p></InfoTip>
               <div className="flex items-baseline justify-center gap-1">
                 <span className="text-5xl font-bold text-emerald-400">{laggingScore}</span>
               </div>

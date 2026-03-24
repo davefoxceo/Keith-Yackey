@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { InfoTip } from "@/components/ui/tooltip";
 
 interface DialCardProps {
   name: string;
@@ -85,13 +86,15 @@ export function DialCard({
           <span className="text-sm text-slate-500">/7</span>
         </div>
         {diff && (
-          <div className="flex items-center gap-1">
-            {trendIcons[trend]}
-            <span className={cn("text-xs font-medium", trendColors[trend])}>
-              {trend === "up" ? "+" : trend === "down" ? "-" : ""}
-              {diff}
-            </span>
-          </div>
+          <InfoTip tip="Change from last week's assessment">
+            <div className="flex items-center gap-1">
+              {trendIcons[trend]}
+              <span className={cn("text-xs font-medium", trendColors[trend])}>
+                {trend === "up" ? "+" : trend === "down" ? "-" : ""}
+                {diff}
+              </span>
+            </div>
+          </InfoTip>
         )}
       </div>
     </motion.div>

@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Flame } from "lucide-react";
+import { InfoTip } from "@/components/ui/tooltip";
 
 interface StreakCounterProps {
   count: number;
@@ -47,7 +48,7 @@ export function StreakCounter({ count, size = "md" }: StreakCounterProps) {
         >
           {count}
         </motion.p>
-        <p className={`${s.sub} text-slate-400 font-medium`}>day streak</p>
+        <InfoTip tip="Consecutive days you've checked in. Miss a day and it resets."><p className={`${s.sub} text-slate-400 font-medium`}>day streak</p></InfoTip>
       </div>
     </motion.div>
   );
