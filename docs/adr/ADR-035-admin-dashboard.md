@@ -123,3 +123,52 @@ All endpoints use the `@AdminOnly()` decorator which applies the `AdminGuard`.
 
 - Keith could become overwhelmed by alerts if many clients drop off simultaneously (mitigation: batch alerts into a daily digest)
 - Grading thresholds may not match Keith's intuition initially (mitigation: make thresholds configurable from admin settings)
+
+---
+
+## Enhanced Admin Views (Post-Demo Feedback)
+
+The following enhancements extend the admin dashboard based on coaching workflow feedback. The goal is to give Keith ONE screen that shows him everything he needs to run his business and prepare for client interactions.
+
+### Single-Dashboard Summary (`/admin`)
+
+The overview dashboard is expanded to show all critical KPIs in a single view without navigation:
+
+| Widget | Data | Source |
+|--------|------|--------|
+| Total Active Users | Count of users with activity in the last 14 days | UserService |
+| MRR | Current monthly recurring revenue | Stripe (ADR-034) |
+| Average Leading Score | Mean leading score across all active users | AssessmentService |
+| Users At Risk | Count and list of users with grade C or below | GradingService |
+| Upcoming Call Prep | Next scheduled call with client count and red flag count | CallPrepService (ADR-050) |
+| Referral Activity | New referrals this week, pending invites, top referrer | ReferralService (ADR-044) |
+| Belt Distribution Chart | Bar chart showing user count per belt level | BeltService (ADR-037) |
+
+### Call Prep View
+
+A dedicated admin section for pre-call client briefings. See ADR-050 for full specification. The admin sidebar links to `/admin/calls` with a red alert badge when any client on today's calls has a grade below C.
+
+### User Drill-Down (`/admin/clients/:id`)
+
+The existing client detail page is enhanced with deep-dive capabilities:
+
+- **Dial History Chart**: line chart showing all 5 dials over time (4-week, 12-week, all-time toggles)
+- **Conversation Log**: full chat history with mode labels, searchable by keyword and date range
+- **Challenges Completed**: list of completed and in-progress challenges with dates and outcomes
+- **Referrals Made**: users this client referred, their current status, and any earned rewards (ADR-044)
+- **Payment History**: subscription tier changes, payment dates, failed charges, refunds (ADR-034)
+
+### Engagement Heatmap (`/admin/engagement`)
+
+A visual heatmap (7 columns for days, 24 rows for hours) showing when users are most active across the platform. Cell intensity represents session count. This helps Keith understand usage patterns and schedule calls or content drops at peak engagement times.
+
+### Content Performance (`/admin/content`)
+
+Extends the existing content management view with analytics on which RAG content entries are being referenced most frequently in AI responses. Table columns: content title, reference count (last 30 days), unique users served, average conversation rating when content was cited. Helps Keith prioritize content creation and identify gaps.
+
+### Cross-References
+
+- ADR-044: Referral leaderboard data feeds into the dashboard summary and user drill-down
+- ADR-046: Leaderboard data powers the belt distribution chart and engagement metrics
+- ADR-049: Accountability alerts surface in the "Users At Risk" widget and user drill-down red flags
+- ADR-050: Call prep reports are accessible directly from the dashboard and the dedicated calls view
