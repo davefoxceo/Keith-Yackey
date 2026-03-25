@@ -215,6 +215,10 @@ const scenarios = {
 
 let revenueChart, usersChart, distChart;
 
+// Slider params (must be before tab handler)
+const params = ['p-newusers','p-churn','p-arpu','p-acqgrowth','p-seed','p-cac'];
+params.forEach(id => document.getElementById(id).addEventListener('input', updateLabels));
+
 // Tab switching
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -241,9 +245,7 @@ params.forEach(id => {
   });
 });
 
-// Slider labels
-const params = ['p-newusers','p-churn','p-arpu','p-acqgrowth','p-seed','p-cac'];
-params.forEach(id => document.getElementById(id).addEventListener('input', updateLabels));
+// Slider labels already bound above
 
 function updateLabels() {
   document.getElementById('v-newusers').textContent = document.getElementById('p-newusers').value;
