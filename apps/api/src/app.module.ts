@@ -12,6 +12,7 @@ import { CommunityModule } from './modules/community/community.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { UserModule } from './modules/user/user.module';
 import { LearningModule } from './modules/learning/learning.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { LearningModule } from './modules/learning/learning.module';
     CommunityModule,
     SubscriptionModule,
     UserModule,
+    AdminModule,
   ],
   providers: [
     {

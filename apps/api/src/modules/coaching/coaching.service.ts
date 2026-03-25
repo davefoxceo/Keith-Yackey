@@ -476,6 +476,142 @@ export class CoachingService {
   }
 
   /**
+   * Stream a chat message that includes an image (screenshot).
+   * Uses Claude's multimodal API to analyze the image alongside the text.
+   * The image is sent as base64 but NOT persisted — only text is stored.
+   */
+  async *streamChatWithImage(
+    userId: string,
+    message: string,
+    imageBuffer: Buffer,
+    imageMimeType: string,
+    conversationId?: string,
+    modeStr?: string,
+  ): AsyncGenerator<string> {
+    const mode = (modeStr as CoachingMode) || CoachingMode.COACH;
+
+    // Get or create conversation
+    let conversation: Conversation;
+    if (conversationId && this.getConv(conversationId)) {
+      conversation = this.getConv(conversationId)!;
+      if (conversation.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    } else {
+      const newId = uuidv4();
+      conversation = {
+        id: newId,
+        userId,
+        title: this.generateTitle(message),
+        mode,
+        messages: [
+          {
+            id: uuidv4(),
+            role: MessageRole.SYSTEM,
+            content: this.buildSystemPromptWithRAG(mode),
+            mode,
+            timestamp: new Date(),
+          },
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.saveConv(conversation);
+    }
+
+    // Store the user message (text only — image is not persisted)
+    conversation.messages.push({
+      id: uuidv4(),
+      role: MessageRole.USER,
+      content: `[Image attached] ${message}`,
+      mode: conversation.mode,
+      timestamp: new Date(),
+    });
+
+    try {
+      // RAG context
+      const ragContext = await this.learningService.getRAGContext(userId, message);
+      const systemPrompt = this.buildSystemPromptWithRAG(
+        conversation.mode,
+        conversation.fiveDialsContext,
+        ragContext,
+      );
+
+      // Build API messages: all prior messages as text, the latest as multimodal
+      const priorMessages = conversation.messages
+        .filter((m) => m.role !== MessageRole.SYSTEM)
+        .slice(0, -1) // exclude the message we just added
+        .map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }));
+
+      // The current user message with image + text (multimodal content)
+      const base64Data = imageBuffer.toString('base64');
+      const mediaType = imageMimeType as 'image/png' | 'image/jpeg' | 'image/webp';
+
+      const currentMessage = {
+        role: 'user' as const,
+        content: [
+          {
+            type: 'image' as const,
+            source: {
+              type: 'base64' as const,
+              media_type: mediaType,
+              data: base64Data,
+            },
+          },
+          {
+            type: 'text' as const,
+            text: message,
+          },
+        ],
+      };
+
+      const apiMessages = [...priorMessages, currentMessage];
+
+      const stream = this.anthropic.messages.stream({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: apiMessages,
+      });
+
+      let fullContent = '';
+
+      for await (const event of stream) {
+        if (
+          event.type === 'content_block_delta' &&
+          event.delta.type === 'text_delta'
+        ) {
+          fullContent += event.delta.text;
+          yield event.delta.text;
+        }
+      }
+
+      // Store assistant message (text only)
+      conversation.messages.push({
+        id: uuidv4(),
+        role: MessageRole.ASSISTANT,
+        content: fullContent,
+        mode: conversation.mode,
+        timestamp: new Date(),
+      });
+      conversation.updatedAt = new Date();
+      this.saveConv(conversation);
+
+      // Store for RAG
+      this.storeConversationForLearning(userId, conversation);
+
+      // Yield conversation metadata
+      yield `\n[CONV_ID:${conversation.id}]`;
+    } catch (error) {
+      this.logger.error(`Streaming chat with image failed: ${error.message}`);
+      yield "I appreciate you sharing that. I'm experiencing a brief technical difficulty, but I'm here for you.";
+    }
+  }
+
+  /**
    * Build system prompt with RAG context injected.
    *
    * RAG context includes:

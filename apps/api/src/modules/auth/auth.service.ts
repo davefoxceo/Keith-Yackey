@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { DataStore } from '../learning/data-store.service';
+import { AccountabilityService } from '../coaching/accountability.service';
 
 interface StoredUser {
   id: string;
@@ -34,6 +35,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly dataStore: DataStore,
+    private readonly accountabilityService: AccountabilityService,
   ) {}
 
   private get users(): Map<string, StoredUser> {
@@ -139,6 +141,11 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    // Run accountability evaluation in the background (fire-and-forget)
+    this.accountabilityService.evaluateOnLogin(userId).catch((err) => {
+      this.logger.warn(`Accountability evaluation failed for ${userId}: ${err.message}`);
+    });
+
     return {
       id: user.id,
       email: user.email,
@@ -152,6 +159,24 @@ export class AuthService {
 
   async findUserById(userId: string): Promise<StoredUser | undefined> {
     return this.users.get(userId);
+  }
+
+  /**
+   * Promote a user to admin role.
+   * Sets the 'role' field to 'admin' in the DataStore.
+   */
+  async promoteToAdmin(userId: string): Promise<{ promoted: boolean }> {
+    const user = this.users.get(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    (user as any).role = 'admin';
+    user.updatedAt = new Date().toISOString();
+    this.dataStore.set('users', userId, user);
+
+    this.logger.log(`User ${user.email} (${userId}) promoted to admin`);
+    return { promoted: true };
   }
 
   private async generateTokens(user: StoredUser) {
