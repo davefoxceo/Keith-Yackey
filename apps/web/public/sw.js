@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coach-keith-v1';
+const CACHE_NAME = 'coach-keith-v2';
 const STATIC_ASSETS = [
   '/',
   '/dashboard',

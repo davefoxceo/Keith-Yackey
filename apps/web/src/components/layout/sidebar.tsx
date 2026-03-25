@@ -16,6 +16,7 @@ import {
   Crown,
   Flame,
   LogOut,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/content", icon: BookOpen, label: "Content" },
   { href: "/brotherhood", icon: Users, label: "Brotherhood" },
   { href: "/settings", icon: Settings, label: "Settings" },
+  { href: "/admin", icon: Shield, label: "Admin" },
 ];
 
 export function Sidebar() {

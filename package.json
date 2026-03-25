@@ -25,13 +25,18 @@
     "pipeline:embed": "npm run embed --workspace=tools/content-pipeline"
   },
   "devDependencies": {
-    "turbo": "^2.4.0",
-    "typescript": "^5.7.0",
+    "eslint": "^9.0.0",
     "prettier": "^3.5.0",
-    "eslint": "^9.0.0"
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
   },
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "npm@10.9.3"
+  "packageManager": "npm@10.9.3",
+  "dependencies": {
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@ruvector/core": "^0.1.30",
+    "@ruvector/node": "^0.1.22"
+  }
 }

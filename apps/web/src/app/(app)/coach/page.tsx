@@ -14,6 +14,7 @@ import { ChatMessage } from "@/components/coaching/chat-message";
 import { ChatInput } from "@/components/coaching/chat-input";
 import { ConversationStarters } from "@/components/coaching/conversation-starters";
 import { ModeSelector } from "@/components/coaching/mode-selector";
+import { InterventionBanner } from "@/components/coaching/intervention-banner";
 import { useChat, type Conversation, type ConversationMode } from "@/hooks/use-chat";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ export default function CoachPage() {
     conversations,
     setMode,
     sendMessage,
+    sendMessageWithImage,
     stopStreaming,
     giveFeedback,
     loadConversation,
@@ -46,6 +48,10 @@ export default function CoachPage() {
 
   const handleSend = (content: string) => {
     sendMessage(content);
+  };
+
+  const handleSendWithImage = (content: string, imageFile: File) => {
+    sendMessageWithImage(content, imageFile);
   };
 
   return (
@@ -141,6 +147,9 @@ export default function CoachPage() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto">
+          {/* Intervention Banner */}
+          <InterventionBanner />
+
           {messages.length === 0 ? (
             <ConversationStarters onSelect={handleSend} />
           ) : (
@@ -165,6 +174,7 @@ export default function CoachPage() {
         {/* Input */}
         <ChatInput
           onSend={handleSend}
+          onSendWithImage={handleSendWithImage}
           onStop={stopStreaming}
           isStreaming={isStreaming}
         />

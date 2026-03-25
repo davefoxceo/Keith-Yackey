@@ -22,6 +22,8 @@ import { HealthScore } from "@/components/dials/health-score";
 import { StreakCounter } from "@/components/engagement/streak-counter";
 import { MilestoneBadge } from "@/components/engagement/milestone-badge";
 import { DailyPrompt } from "@/components/engagement/daily-prompt";
+import { DailyActions } from "@/components/coaching/daily-actions";
+import { WeeklyChallenge } from "@/components/coaching/weekly-challenge";
 
 const radarData = [
   { dial: "Parent", score: 5, fullMark: 7 as const },
@@ -173,32 +175,14 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-400" />
-                <CardTitle className="text-base">Active Challenge</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-300 mb-2">
-                Player Dial: 30 pushups every morning for 7 days
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: "71%" }}
-                    transition={{ duration: 1, delay: 0.5 }}
-                    className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
-                  />
-                </div>
-                <span className="text-xs text-slate-400 font-medium">5/7</span>
-              </div>
-            </CardContent>
-          </Card>
+          <WeeklyChallenge />
         </motion.div>
       </div>
+
+      {/* Daily Actions */}
+      <motion.div variants={item}>
+        <DailyActions />
+      </motion.div>
 
       {/* Bottom Row: Milestones + Upcoming */}
       <div className="grid lg:grid-cols-2 gap-6">

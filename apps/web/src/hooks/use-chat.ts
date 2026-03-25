@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { api } from "@/lib/api";
+import { api, API_BASE_URL, getAuthToken } from "@/lib/api";
 
 export type ConversationMode = "free" | "crisis" | "framework" | "accountability";
 
@@ -34,6 +34,69 @@ export function useChat(options: UseChatOptions = {}) {
   const [mode, setMode] = useState<ConversationMode>(options.mode || "free");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const refreshConversations = useCallback(async () => {
+    try {
+      const data = await api.get<{ items: Array<{ id: string; title: string; mode: string; messageCount: number; lastMessageAt: string; createdAt: string }> }>("/coaching/conversations");
+      setConversations((data.items || []).map((item) => ({
+        id: item.id,
+        title: item.title,
+        lastMessage: `${item.messageCount} messages`,
+        updatedAt: new Date(item.lastMessageAt || item.createdAt),
+        mode: (item.mode || "free") as ConversationMode,
+      })));
+    } catch { /* ignore */ }
+  }, []);
+
+  const processStream = useCallback(
+    async (response: Response, assistantMessageId: string) => {
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No response body");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullContent = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith("data: ")) {
+            const data = trimmed.slice(6);
+            if (data === "[DONE]") return;
+            let parsed: { text?: string; content?: string };
+            try {
+              parsed = JSON.parse(data);
+            } catch {
+              parsed = { text: data };
+            }
+            const text = parsed.text || parsed.content || "";
+            // Check for conversation ID metadata
+            if (text.startsWith("\n[CONV_ID:")) {
+              const match = text.match(/\[CONV_ID:(.+?)\]/);
+              if (match) setConversationId(match[1]);
+              continue;
+            }
+            fullContent += text;
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, content: fullContent }
+                  : msg
+              )
+            );
+          }
+        }
+      }
+    },
+    []
+  );
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -98,20 +161,81 @@ export function useChat(options: UseChatOptions = {}) {
         );
       } finally {
         setIsStreaming(false);
-        // Refresh sidebar conversation list
-        try {
-          const data = await api.get<{ items: Array<{ id: string; title: string; mode: string; messageCount: number; lastMessageAt: string; createdAt: string }> }>("/coaching/conversations");
-          setConversations((data.items || []).map((item) => ({
-            id: item.id,
-            title: item.title,
-            lastMessage: `${item.messageCount} messages`,
-            updatedAt: new Date(item.lastMessageAt || item.createdAt),
-            mode: (item.mode || "free") as ConversationMode,
-          })));
-        } catch { /* ignore */ }
+        refreshConversations();
       }
     },
-    [conversationId, mode]
+    [conversationId, mode, refreshConversations]
+  );
+
+  const sendMessageWithImage = useCallback(
+    async (content: string, imageFile: File) => {
+      const userMessage: ChatMessage = {
+        id: `msg-${Date.now()}`,
+        role: "user",
+        content,
+        timestamp: new Date(),
+        mode,
+      };
+
+      setMessages((prev) => [...prev, userMessage]);
+      setIsStreaming(true);
+
+      const assistantMessage: ChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+        mode,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+
+      try {
+        const formData = new FormData();
+        formData.append("message", content);
+        formData.append("image", imageFile);
+        formData.append("mode", mode);
+        if (conversationId) {
+          formData.append("conversationId", conversationId);
+        }
+
+        const token = getAuthToken();
+        const headers: Record<string, string> = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        // Do NOT set Content-Type; the browser sets it with the boundary for multipart
+
+        const response = await fetch(`${API_BASE_URL}/coaching/chat-with-image`, {
+          method: "POST",
+          headers,
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+
+        await processStream(response, assistantMessage.id);
+      } catch (error) {
+        console.error("Chat with image error:", error);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessage.id
+              ? {
+                  ...msg,
+                  content:
+                    "I apologize, but I'm having trouble processing your image right now. Please try again in a moment.",
+                }
+              : msg
+          )
+        );
+      } finally {
+        setIsStreaming(false);
+        refreshConversations();
+      }
+    },
+    [conversationId, mode, processStream, refreshConversations]
   );
 
   const stopStreaming = useCallback(() => {
@@ -185,6 +309,7 @@ export function useChat(options: UseChatOptions = {}) {
     conversations,
     setMode,
     sendMessage,
+    sendMessageWithImage,
     stopStreaming,
     giveFeedback,
     loadConversation,
